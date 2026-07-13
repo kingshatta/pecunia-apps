@@ -12,6 +12,8 @@ import { MachineBoard } from './screens/MachineBoard'
 import { Events } from './screens/Events'
 import { MyLaundry } from './screens/MyLaundry'
 import { Banners } from './components/Banners'
+import { HoursNotice } from './components/HoursNotice'
+import { LOCK_LABEL, OPEN_LABEL, isShoLocked, minutesUntilLock } from './lib/hours'
 
 type Tab = 'machines' | 'events' | 'laundry'
 
@@ -197,6 +199,8 @@ export default function App() {
         </div>
       </header>
 
+      <HoursNotice now={now} />
+
       <main key={`${tab}-${side}`} className="anim-rise relative z-10 pt-4">
         {tab === 'machines' && (
           <MachineBoard
@@ -204,7 +208,13 @@ export default function App() {
             loads={loads}
             now={now}
             myDeviceId={deviceId}
+            locked={isShoLocked(now)}
+            minutesToLock={minutesUntilLock(now)}
             onStart={async (machine, minutes) => {
+              if (isShoLocked(Date.now())) {
+                pushBanner('The Sho is locked 🔒', `Doors open at ${OPEN_LABEL}.`, 'warning')
+                return
+              }
               try {
                 await adapter.startLoad({ machineId: machine.id, minutes, ownerName: name, deviceId })
                 pushBanner(
@@ -301,7 +311,7 @@ export default function App() {
         {sideName} · Camp Cho-Yeh — a place where Jesus Christ transforms lives through
         meaningful relationships and outdoor adventures
         <br />
-        Machine timers are camper-entered estimates
+        Sho hours: {OPEN_LABEL} – {LOCK_LABEL} · Machine timers are camper-entered estimates
       </div>
     </div>
   )

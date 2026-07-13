@@ -10,13 +10,16 @@ export interface MachineBoardProps {
   loads: Load[]
   now: number
   myDeviceId: string
+  locked: boolean
+  minutesToLock: number
   onStart: (machine: Machine, minutes: number) => void
   onCollect: (load: Load) => void
   onAdjust: (load: Load, minutes: number) => void
 }
 
 export function MachineBoard(props: MachineBoardProps) {
-  const { machines, loads, now, myDeviceId, onStart, onCollect, onAdjust } = props
+  const { machines, loads, now, myDeviceId, locked, minutesToLock, onStart, onCollect, onAdjust } =
+    props
   const [openMachine, setOpenMachine] = useState<Machine | null>(null)
 
   const loadFor = (m: Machine): Load | null =>
@@ -61,6 +64,8 @@ export function MachineBoard(props: MachineBoardProps) {
           load={loadFor(openMachine)}
           now={now}
           myDeviceId={myDeviceId}
+          locked={locked}
+          minutesToLock={minutesToLock}
           onStart={(minutes) => {
             onStart(openMachine, minutes)
             setOpenMachine(null)

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Load, Machine } from '../lib/types'
 import { GRACE_MINUTES, MINUTE_PRESETS, derivedStatus } from '../lib/types'
 import { minutesLeft, minutesSince } from '../lib/time'
+import { LOCK_LABEL, OPEN_LABEL } from '../lib/hours'
 import { Sheet } from './Sheet'
 
 export interface StartLoadSheetProps {
@@ -9,6 +10,8 @@ export interface StartLoadSheetProps {
   load: Load | null
   now: number
   myDeviceId: string
+  locked: boolean
+  minutesToLock: number
   onStart: (minutes: number) => void
   onCollect: (load: Load) => void
   onAdjust: (load: Load, minutes: number) => void
@@ -72,7 +75,8 @@ function MinutePicker({
 }
 
 export function StartLoadSheet(props: StartLoadSheetProps) {
-  const { machine, load, now, myDeviceId, onStart, onCollect, onAdjust, onClose } = props
+  const { machine, load, now, myDeviceId, locked, minutesToLock, onStart, onCollect, onAdjust, onClose } =
+    props
   const kindLabel = machine.kind === 'washer' ? 'Washer' : 'Dryer'
   const title = `${kindLabel} ${machine.number}`
   const status = load ? derivedStatus(load, now) : null
@@ -82,12 +86,28 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
 
   // Free machine (or takeover confirmed) → minute picker
   if (!load || status === 'collected' || status === 'displaced' || takingOver) {
+    if (locked) {
+      return (
+        <Sheet title={title} onClose={onClose}>
+          <div className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
+            🔒 The Sho is locked for the night ({LOCK_LABEL} – {OPEN_LABEL}). New loads can't be
+            started until it opens.
+          </div>
+        </Sheet>
+      )
+    }
     return (
       <Sheet title={takingOver ? `Take over ${title}` : `Start a load — ${title}`} onClose={onClose}>
         {takingOver && load && (
           <div className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
             {load.ownerName}'s load will be marked as taken out, and they'll be told their
             laundry is no longer in this machine.
+          </div>
+        )}
+        {minutesToLock <= 90 && (
+          <div className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+            🌙 The Sho locks at {LOCK_LABEL} — {minutesToLock} min from now. Make sure your load
+            finishes (and is collected) before then.
           </div>
         )}
         <MinutePicker
