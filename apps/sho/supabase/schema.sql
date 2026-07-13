@@ -215,7 +215,7 @@ select cron.schedule(
   '* * * * *',
   $$
   select net.http_post(
-    url := 'https://jehsflkioicahjeigqst.supabase.co/functions/v1/dynamic-endpoint',
+    url := 'https://jehsflkioicahjeigqst.supabase.co/functions/v1/push',
     headers := '{"Content-Type": "application/json"}'::jsonb,
     body := '{"type": "tick"}'::jsonb
   );

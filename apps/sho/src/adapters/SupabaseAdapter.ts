@@ -4,7 +4,7 @@ import type { CampEvent, EventSide, Load, LoadStatus, LocationId, Machine, Machi
 
 // Name of the deployed Supabase Edge Function. Must match the function's name in
 // the dashboard AND the cron URL in supabase/schema.sql.
-const PUSH_FUNCTION = 'dynamic-endpoint'
+const PUSH_FUNCTION = 'push'
 
 interface LoadRow {
   id: string
