@@ -2,6 +2,10 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { DataAdapter, NewEventInput } from './DataAdapter'
 import type { CampEvent, EventSide, Load, LoadStatus, LocationId, Machine, MachineKind } from '../lib/types'
 
+// Name of the deployed Supabase Edge Function. Must match the function's name in
+// the dashboard AND the cron URL in supabase/schema.sql.
+const PUSH_FUNCTION = 'dynamic-endpoint'
+
 interface LoadRow {
   id: string
   machine_id: string
@@ -206,7 +210,7 @@ export class SupabaseAdapter implements DataAdapter {
   async notifyEvent(eventId: string): Promise<void> {
     // Fire-and-forget: a push failure should never block creating the event.
     try {
-      await this.client.functions.invoke('push', {
+      await this.client.functions.invoke(PUSH_FUNCTION, {
         body: { type: 'event', eventId },
       })
     } catch (e) {
