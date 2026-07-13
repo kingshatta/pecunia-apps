@@ -21,13 +21,14 @@ create table if not exists machines (
   number int not null
 );
 
--- 6 washers + 6 dryers per sho. Make sure the physical machines are
--- labeled with the same numbers the app shows.
+-- Per-sho machine counts: Pines has 6 washers + 6 dryers, Timbers has 2 + 2.
+-- Make sure the physical machines are labeled with the same numbers the app shows.
 insert into machines (id, location, kind, number)
 select l.loc || '-' || k.kind || '-' || n, l.loc, k.kind, n
-from (values ('pines'), ('timbers')) as l(loc),
+from (values ('pines', 6), ('timbers', 2)) as l(loc, cnt),
      (values ('washer'), ('dryer')) as k(kind),
      generate_series(1, 6) as n
+where n <= l.cnt
 on conflict (id) do nothing;
 
 create table if not exists loads (

@@ -5,6 +5,7 @@ import { LOCATIONS, derivedStatus } from './lib/types'
 import { getDeviceId, getName, getSide, setName, setSide } from './lib/device'
 import { isDemo } from './lib/config'
 import { pushBanner, notifyLocal } from './lib/banners'
+import { playChime, unlockAudio } from './lib/chime'
 import { enableNotifications, type PushResult } from './lib/push'
 import { useNow } from './hooks/useNow'
 import { Onboarding } from './screens/Onboarding'
@@ -82,38 +83,51 @@ export default function App() {
     }
   }, [adapter, refresh])
 
-  // In-app alerts for MY loads finishing or being displaced (server push
-  // covers the closed-app case in live mode).
+  // In-app alerts for MY loads finishing or being displaced. Exactly one alert
+  // per event: if the app is visible, an in-app banner + chime; if it's hidden
+  // and we don't have server push, a local system notification. When server
+  // push IS on and the app is hidden/closed, the edge function handles it (and
+  // the service worker stays quiet while a tab is visible), so nothing doubles.
   useEffect(() => {
     const notified = getNotified()
+    const visible = document.visibilityState === 'visible'
+    const alertMine = (title: string, body: string, tone: 'success' | 'warning') => {
+      if (visible) {
+        pushBanner(title, body, tone)
+        playChime()
+      } else if (notifState !== 'granted') {
+        notifyLocal(title, body)
+      }
+    }
     for (const l of myLoads) {
       const label = machineLabel(allMachines, l.machineId)
       const status = derivedStatus(l, now)
       if (status === 'done' && !notified.done.includes(l.id)) {
         markNotified('done', l.id)
-        pushBanner(`${label} is done! 🧺`, 'Go grab your clothes before someone else does.', 'success')
-        notifyLocal(`${label} is done!`, 'Go grab your clothes before someone else does.')
+        alertMine(`${label} is done! 🧺`, 'Come grab your laundry before someone moves it.', 'success')
       }
       if (status === 'displaced' && !notified.displaced.includes(l.id)) {
         markNotified('displaced', l.id)
-        pushBanner(
+        alertMine(
           `Your load was taken out of ${label}`,
           `${l.displacedByName ?? 'Someone'} needed the machine — check the table or baskets.`,
           'warning',
         )
-        notifyLocal(
-          `Your load was taken out of ${label}`,
-          'Check the table or baskets in the Sho.',
-        )
       }
     }
-  }, [myLoads, now, allMachines])
+  }, [myLoads, now, allMachines, notifState])
 
   const handleOnboard = (newName: string, newSide: LocationId) => {
     setName(newName)
     setSide(newSide)
     setNameState(newName)
     setSideState(newSide)
+    // The "Let's go" tap is a genuine user gesture, so we can unlock audio and
+    // ask for notification permission right here — no need to send people into
+    // a settings screen. requestPermission() must run in the gesture's call
+    // stack (iOS requirement), so call it synchronously, not after an await.
+    unlockAudio()
+    void enableNotifications(adapter, deviceId, newSide, newName).then(setNotifState)
   }
 
   const switchSide = (s: LocationId) => {

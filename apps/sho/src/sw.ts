@@ -28,11 +28,18 @@ self.addEventListener('push', (event) => {
     payload = { body: event.data?.text() ?? '' }
   }
   event.waitUntil(
-    self.registration.showNotification(payload.title ?? 'The Sho', {
-      body: payload.body ?? '',
-      icon: 'icons/icon-192.png',
-      badge: 'icons/icon-192.png',
-    }),
+    (async () => {
+      // If the app is already open and on-screen, the in-app banner + chime
+      // handles it — showing a system notification too would be a duplicate.
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      if (clients.some((c) => (c as WindowClient).visibilityState === 'visible')) return
+      await self.registration.showNotification(payload.title ?? 'The Sho', {
+        body: payload.body ?? '',
+        icon: 'icons/icon-192.png',
+        badge: 'icons/icon-192.png',
+        vibrate: [200, 100, 200],
+      } as NotificationOptions)
+    })(),
   )
 })
 

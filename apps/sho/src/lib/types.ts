@@ -58,8 +58,8 @@ export interface CampEvent {
 export const GRACE_MINUTES = 10
 
 export const MINUTE_PRESETS: Record<MachineKind, number[]> = {
-  washer: [25, 30, 35, 45],
-  dryer: [40, 50, 60, 75],
+  washer: [15, 25, 35, 45],
+  dryer: [15, 30, 45, 60],
 }
 
 export function derivedStatus(load: Load, now: number): DerivedLoadStatus {

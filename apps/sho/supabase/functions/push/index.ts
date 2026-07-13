@@ -156,7 +156,7 @@ async function handleTick(): Promise<Response> {
       if (sub) {
         const r = await sendTo(appServer, [sub], {
           title: `${machineLabel(load.machine_id)} is done! 🧺`,
-          body: 'Go grab your clothes before someone else needs the machine.',
+          body: 'Come grab your laundry before someone moves it.',
         })
         sent += r.sent
       }
@@ -178,8 +178,8 @@ async function handleTick(): Promise<Response> {
       const sub = subs.get(load.device_id)
       if (sub) {
         const r = await sendTo(appServer, [sub], {
-          title: `Your laundry is still in ${machineLabel(load.machine_id)} ⏰`,
-          body: `It finished ${GRACE_MINUTES}+ minutes ago — please clear the machine for the next person.`,
+          title: `Someone's waiting on ${machineLabel(load.machine_id)} ⏳`,
+          body: `Your laundry's been done ${GRACE_MINUTES}+ min — please come clear the machine.`,
         })
         sent += r.sent
       }

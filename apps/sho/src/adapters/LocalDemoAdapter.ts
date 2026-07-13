@@ -3,10 +3,10 @@ import type { CampEvent, Load, LocationId, Machine, MachineKind } from '../lib/t
 
 const STATE_KEY = 'sho_demo_state'
 
-/** 6 washers + 6 dryers per sho — mirror of supabase/schema.sql seeds. */
+/** Per-sho machine counts — mirror of supabase/schema.sql seeds. */
 const MACHINE_COUNTS: Record<LocationId, Record<MachineKind, number>> = {
   pines: { washer: 6, dryer: 6 },
-  timbers: { washer: 6, dryer: 6 },
+  timbers: { washer: 2, dryer: 2 },
 }
 
 interface DemoState {
@@ -54,10 +54,9 @@ function seedState(): DemoState {
       demoLoad('pines-washer-3', 'pines', 'Jake', -55, -22),
       demoLoad('pines-washer-5', 'pines', 'Noah', -8, 24),
       demoLoad('pines-dryer-1', 'pines', 'Carlos', -20, 35),
-      // Timbers: a washer about to finish, a dryer just done, a dryer mid-cycle
+      // Timbers (2 washers + 2 dryers): a washer about to finish, a dryer just done
       demoLoad('timbers-washer-1', 'timbers', 'Priya', -28, 3),
       demoLoad('timbers-dryer-2', 'timbers', 'Sam', -62, -4),
-      demoLoad('timbers-dryer-5', 'timbers', 'Ava', -15, 41),
     ],
     events: [
       {
