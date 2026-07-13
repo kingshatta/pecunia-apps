@@ -14,9 +14,10 @@ Everything below is free tier. Do the steps in order. Where you see
 - Label the physical machines with numbers matching the app (Washer 1, 2, … Dryer 1, 2, …).
 
 ## 1. Turn on hosting (GitHub Pages)
-1. Repo → Settings → Pages → Source: **GitHub Actions**.
-2. Actions tab → run "Deploy The Sho to GitHub Pages" (or push any change to `apps/sho/`).
-3. Your app is now at `https://<your-username>.github.io/pecunia-apps/` — open it.
+1. Nothing to configure: any push touching `apps/sho/` runs the "Deploy The Sho
+   to GitHub Pages" workflow, which builds the app and publishes it to the
+   `gh-pages` branch — GitHub Pages serves that branch automatically.
+2. Your app is at `https://<your-username>.github.io/pecunia-apps/` — open it.
    It runs in **DEMO mode** (yellow badge) until step 5 is done. That's expected.
 
 ## 2. Create the Supabase project (the shared brain)
