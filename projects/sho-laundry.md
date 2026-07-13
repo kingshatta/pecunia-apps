@@ -23,10 +23,12 @@ key. Playwright e2e vs LIVE db passed: onboard → start load → persisted to S
 `apps/sho/` builds + force-pushes dist to `gh-pages` (Pages configure-pages route
 needs admin token the workflow lacks). Sho hours: locked 11:30 PM–7:00 AM (strip,
 start blocked, warnings; device-local) + matching push quiet hours (America/Chicago).
-VAPID keypair was generated locally (not via vapid-setup) and validated round-trip
-through @negrel/webpush importVapidKeys; private half handed to Sheen as VAPID_KEYS.
-REMAINING for push delivery: (1) `push` function must be DEPLOYED — invoking it
-returned NOT_FOUND, so redeploy in dashboard + JWT verification OFF; (2) save secret
-VAPID_KEYS (value sent to Sheen) + VAPID_CONTACT=mailto:kandohsheen@gmail.com; cron
-tick already points at /functions/v1/push. Then on-phone push test (DEPLOY.md step 6),
-poster print, soft launch. Do NOT run vapid-setup (VAPID_KEYS is pre-set).
+VAPID keypair generated locally (not via vapid-setup), validated round-trip through
+@negrel/webpush importVapidKeys. PUSH FULLY DEPLOYED 2026-07-13 via Supabase
+Management API (temp PAT, since revoked): function `push` (lowercase — the dashboard
+had created it as capital `Push`, which is why /functions/v1/push 404'd; template
+deleted), verify_jwt off, secrets VAPID_KEYS + VAPID_CONTACT set. Verified: tick →
+200 {"ok":true,"sent":0} (loads keys + runs all queries), vapid-setup → 400 "already
+set", cron `sho-push-tick` active every minute at /functions/v1/push. REMAINING: only
+the real on-phone closed-app push test (DEPLOY.md step 6 — needs a physical iOS 16.4+
+home-screen install), then poster print + soft launch. Everything else is live.
