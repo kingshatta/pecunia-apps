@@ -14,18 +14,19 @@ Free PWA for Camp Cho-Yeh's two laundry rooms (Pines Sho, Timbers Sho). Live mac
   "Nature That Nurtures", mission statement in onboarding/footer/poster.
 
 ## Current State
-LIVE (demo mode) at https://kingshatta.github.io/pecunia-apps/ since 2026-07-13;
-poster at …/pecunia-apps/poster.html. Deploys automatically: push to main touching
-`apps/sho/` builds and force-pushes dist to the `gh-pages` branch (the Pages
-API/configure-pages route needs admin permissions the workflow token lacks, so the
-workflow publishes via gh-pages instead — no repo settings involved). Verified live
-with Playwright: onboarding → start load → countdown + started banner. Sho hours
-shipped 2026-07-13: locked 11:30 PM–7:00 AM (locked strip, start-load blocked,
-locking-soon warning ≤60 min, sheet heads-up ≤90 min, hours on poster/footer;
-device-local time). Push function has matching quiet hours (America/Chicago):
-tick no-ops overnight, pending pings + overnight event posts announce at 7 AM.
-Clock-faked Playwright checks pass (scratchpad hours-check). Next:
-Supabase setup per DEPLOY.md steps 2–5 with Sheen (project → schema.sql with real
-project ref → `push` edge function, JWT verification off, VAPID_CONTACT secret →
-vapid-setup invoke, save VAPID_KEYS → fill public/config.js), then on-phone push
-test (step 6), then poster print + soft launch.
+LIVE on real backend at https://kingshatta.github.io/pecunia-apps/ (DEMO off since
+2026-07-13). Supabase project ref jehsflkioicahjeigqst: schema loaded (24 machines
+= 6+6 × 2 shos, verified via REST), publishable key sb_publishable_wI4Li…, edge
+function named `push`. config.js has supabaseUrl + publishable key + VAPID public
+key. Playwright e2e vs LIVE db passed: onboard → start load → persisted to Supabase
+→ collected → board clean, no console errors. Auto-deploy: push to main touching
+`apps/sho/` builds + force-pushes dist to `gh-pages` (Pages configure-pages route
+needs admin token the workflow lacks). Sho hours: locked 11:30 PM–7:00 AM (strip,
+start blocked, warnings; device-local) + matching push quiet hours (America/Chicago).
+VAPID keypair was generated locally (not via vapid-setup) and validated round-trip
+through @negrel/webpush importVapidKeys; private half handed to Sheen as VAPID_KEYS.
+REMAINING for push delivery: (1) `push` function must be DEPLOYED — invoking it
+returned NOT_FOUND, so redeploy in dashboard + JWT verification OFF; (2) save secret
+VAPID_KEYS (value sent to Sheen) + VAPID_CONTACT=mailto:kandohsheen@gmail.com; cron
+tick already points at /functions/v1/push. Then on-phone push test (DEPLOY.md step 6),
+poster print, soft launch. Do NOT run vapid-setup (VAPID_KEYS is pre-set).
