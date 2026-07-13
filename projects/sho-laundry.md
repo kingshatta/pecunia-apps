@@ -32,3 +32,12 @@ deleted), verify_jwt off, secrets VAPID_KEYS + VAPID_CONTACT set. Verified: tick
 set", cron `sho-push-tick` active every minute at /functions/v1/push. REMAINING: only
 the real on-phone closed-app push test (DEPLOY.md step 6 — needs a physical iOS 16.4+
 home-screen install), then poster print + soft launch. Everything else is live.
+
+Update 2026-07-13 (v4 of push fn): Timbers now 2 washers + 2 dryers (Pines still
+6+6) — schema per-location seed + live DB trimmed (deleted timbers machines 3-6 via
+Management API). Load timers start at 15 min. Notification permission auto-requested
+on the onboarding "Let's go" tap (user gesture, iOS-safe). In-app chime (Web Audio,
+src/lib/chime.ts) on load-done. Deduped to one alert per event: banner+chime when
+tab visible, system notification when hidden, and the SW skips showNotification while
+any tab is visible; 10-min reminder reworded to a distinct "someone's waiting" nudge.
+All verified live (Playwright vs real site+DB: Timbers 2+2, 15-min preset, no DEMO).
