@@ -14,10 +14,13 @@ Free PWA for Camp Cho-Yeh's two laundry rooms (Pines Sho, Timbers Sho). Live mac
   "Nature That Nurtures", mission statement in onboarding/footer/poster.
 
 ## Current State
-App built and branded at `apps/sho/`: official Cho-Yeh logo + brand greens, Outfit
-display font, animated onboarding/cards/sheets/banners (reduced-motion safe), 6+6
-machines per sho, live-only busyness meter. Demo mode + SupabaseAdapter, schema,
-push edge function, deploy workflow, DEPLOY.md, branded QR poster. 17-check
-Playwright e2e passes. NOT deployed — waiting on: (1) Sheen to create the standalone
-pecunia-apps repo (see MIGRATE.md), (2) Supabase project creation per DEPLOY.md,
-(3) explicit go-live approval.
+LIVE (demo mode) at https://kingshatta.github.io/pecunia-apps/ since 2026-07-13;
+poster at …/pecunia-apps/poster.html. Deploys automatically: push to main touching
+`apps/sho/` builds and force-pushes dist to the `gh-pages` branch (the Pages
+API/configure-pages route needs admin permissions the workflow token lacks, so the
+workflow publishes via gh-pages instead — no repo settings involved). Verified live
+with Playwright: onboarding → start load → countdown + started banner. Next:
+Supabase setup per DEPLOY.md steps 2–5 with Sheen (project → schema.sql with real
+project ref → `push` edge function, JWT verification off, VAPID_CONTACT secret →
+vapid-setup invoke, save VAPID_KEYS → fill public/config.js), then on-phone push
+test (step 6), then poster print + soft launch.
