@@ -25,6 +25,25 @@ import { encodeBase64Url, decodeBase64Url } from 'jsr:@std/encoding@1/base64url'
 
 const GRACE_MINUTES = 10
 
+// Camp quiet hours mirror the sho lock-up (11:30 PM – 7:00 AM camp time):
+// no pushes overnight. The tick's notified_*_at markers stay unset while
+// quiet, so the first tick after 7:00 AM delivers everything pending.
+const QUIET_START_MINUTE = 23 * 60 + 30
+const QUIET_END_MINUTE = 7 * 60
+
+function isCampQuietHours(): boolean {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hourCycle: 'h23',
+    timeZone: 'America/Chicago', // Camp Cho-Yeh is in Texas
+  }).formatToParts(new Date())
+  const h = Number(parts.find((p) => p.type === 'hour')?.value ?? 0)
+  const m = Number(parts.find((p) => p.type === 'minute')?.value ?? 0)
+  const mins = h * 60 + m
+  return mins >= QUIET_START_MINUTE || mins < QUIET_END_MINUTE
+}
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body, null, 2), {
     status,
@@ -116,6 +135,7 @@ function machineLabel(machineId: string): string {
 }
 
 async function handleTick(): Promise<Response> {
+  if (isCampQuietHours()) return json({ ok: true, sent: 0, quiet: true })
   const admin = supabaseAdmin()
   const appServer = await getAppServer()
   const nowIso = new Date().toISOString()
@@ -188,6 +208,17 @@ async function handleTick(): Promise<Response> {
     }
   }
 
+  // 4. Events posted during quiet hours — announce them now instead
+  const { data: pendingEvents } = await admin
+    .from('events')
+    .select('id')
+    .is('notified_at', null)
+    .lt('reports', 3)
+    .gt('starts_at', nowIso)
+  for (const ev of pendingEvents ?? []) {
+    await handleEvent(ev.id)
+  }
+
   return json({ ok: true, sent })
 }
 
@@ -198,6 +229,8 @@ async function handleEvent(eventId: string): Promise<Response> {
   const { data: event } = await admin.from('events').select('*').eq('id', eventId).single()
   if (!event) return json({ error: 'event not found' }, 404)
   if (event.notified_at) return json({ ok: true, skipped: 'already notified' })
+  // During quiet hours, leave notified_at unset — the first morning tick announces it.
+  if (isCampQuietHours()) return json({ ok: true, deferred: 'quiet hours' })
 
   // claim it first so double calls can't double-send
   await admin.from('events').update({ notified_at: new Date().toISOString() }).eq('id', eventId)

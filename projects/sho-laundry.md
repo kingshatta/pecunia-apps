@@ -19,7 +19,12 @@ poster at …/pecunia-apps/poster.html. Deploys automatically: push to main touc
 `apps/sho/` builds and force-pushes dist to the `gh-pages` branch (the Pages
 API/configure-pages route needs admin permissions the workflow token lacks, so the
 workflow publishes via gh-pages instead — no repo settings involved). Verified live
-with Playwright: onboarding → start load → countdown + started banner. Next:
+with Playwright: onboarding → start load → countdown + started banner. Sho hours
+shipped 2026-07-13: locked 11:30 PM–7:00 AM (locked strip, start-load blocked,
+locking-soon warning ≤60 min, sheet heads-up ≤90 min, hours on poster/footer;
+device-local time). Push function has matching quiet hours (America/Chicago):
+tick no-ops overnight, pending pings + overnight event posts announce at 7 AM.
+Clock-faked Playwright checks pass (scratchpad hours-check). Next:
 Supabase setup per DEPLOY.md steps 2–5 with Sheen (project → schema.sql with real
 project ref → `push` edge function, JWT verification off, VAPID_CONTACT secret →
 vapid-setup invoke, save VAPID_KEYS → fill public/config.js), then on-phone push
