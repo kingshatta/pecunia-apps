@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Sho — printable poster</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; color: #0f172a; }
+  .page { max-width: 7.5in; margin: 0 auto; padding: 0.5in 0.5in; text-align: center; }
+  .logo { height: 90px; }
+  h1 { font-size: 42px; color: #004712; margin-top: 10px; letter-spacing: -0.5px; }
+  .tag { font-size: 19px; margin-top: 4px; color: #387c2b; font-weight: 600; }
+  .sub { font-size: 16px; color: #475569; margin-top: 4px; }
+  #qr { display: inline-block; padding: 16px; border: 4px solid #004712; border-radius: 16px; margin: 22px 0 8px; }
+  .url { font-size: 13px; color: #64748b; word-break: break-all; }
+  .steps { text-align: left; margin: 20px auto 0; max-width: 5.6in; font-size: 16px; line-height: 1.5; }
+  .steps h2 { font-size: 18px; color: #004712; margin: 12px 0 4px; }
+  ol { padding-left: 22px; }
+  .rules { margin-top: 22px; background: #e8f1e4; border-radius: 14px; padding: 14px 18px; font-size: 15px; text-align: left; }
+  .mission { margin-top: 14px; font-size: 12px; color: #64748b; font-style: italic; }
+  .no-print { background: #fef3c7; padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; font-size: 14px; text-align: left; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="no-print">
+    🖨️ Print this page (Share → Print on iPad). The QR points to this app's own address
+    automatically. To override: <code>poster.html?url=https://…</code>
+  </div>
+  <img class="logo" src="brand/cho-yeh-logo.svg" alt="Camp Cho-Yeh" />
+  <h1>The Sho 🧺</h1>
+  <div class="tag">Nature That Nurtures — laundry that behaves</div>
+  <div class="sub">See which washers are free · get a ping when your load is done</div>
+  <div id="qr"></div>
+  <div class="url" id="urlText"></div>
+  <div class="steps">
+    <h2>📱 iPhone</h2>
+    <ol>
+      <li>Scan the code, open in <b>Safari</b></li>
+      <li>Tap <b>Share&nbsp;→&nbsp;Add to Home Screen</b> (needed for notifications!)</li>
+      <li>Open the app, enter your name, turn on notifications</li>
+    </ol>
+    <h2>🤖 Android</h2>
+    <ol>
+      <li>Scan the code, open in Chrome</li>
+      <li>Tap <b>Install app</b> when prompted (or menu → Add to Home screen)</li>
+      <li>Enter your name, turn on notifications</li>
+    </ol>
+  </div>
+  <div class="rules">
+    <b>Sho rules:</b> start your load in the app so people can find you · come back when it
+    pings you · loads left sitting 10+ minutes may be moved to the table with love 💚
+  </div>
+  <div class="mission">
+    Camp Cho-Yeh — a place where Jesus Christ transforms lives through meaningful
+    relationships and outdoor adventures.
+  </div>
+</div>
+<script>
+  var params = new URLSearchParams(location.search);
+  var appUrl = params.get('url') || location.href.replace(/poster\.html.*$/, '');
+  new QRCode(document.getElementById('qr'), { text: appUrl, width: 210, height: 210 });
+  document.getElementById('urlText').textContent = appUrl;
+</script>
+</body>
+</html>

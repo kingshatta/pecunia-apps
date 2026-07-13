@@ -1,0 +1,315 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { getAdapter } from './adapters'
+import type { CampEvent, Load, LocationId, Machine } from './lib/types'
+import { LOCATIONS, derivedStatus } from './lib/types'
+import { getDeviceId, getName, getSide, setName, setSide } from './lib/device'
+import { isDemo } from './lib/config'
+import { pushBanner, notifyLocal } from './lib/banners'
+import { enableNotifications, type PushResult } from './lib/push'
+import { useNow } from './hooks/useNow'
+import { Onboarding } from './screens/Onboarding'
+import { MachineBoard } from './screens/MachineBoard'
+import { Events } from './screens/Events'
+import { MyLaundry } from './screens/MyLaundry'
+import { Banners } from './components/Banners'
+
+type Tab = 'machines' | 'events' | 'laundry'
+
+const NOTIFIED_KEY = 'sho_notified'
+
+function getNotified(): { done: string[]; displaced: string[] } {
+  try {
+    const raw = JSON.parse(localStorage.getItem(NOTIFIED_KEY) ?? '{}')
+    return { done: raw.done ?? [], displaced: raw.displaced ?? [] }
+  } catch {
+    return { done: [], displaced: [] }
+  }
+}
+
+function markNotified(kind: 'done' | 'displaced', id: string) {
+  const n = getNotified()
+  n[kind] = [...n[kind], id].slice(-50)
+  localStorage.setItem(NOTIFIED_KEY, JSON.stringify(n))
+}
+
+export default function App() {
+  const adapter = useMemo(() => getAdapter(), [])
+  const deviceId = useMemo(() => getDeviceId(), [])
+  const now = useNow(1000)
+
+  const [name, setNameState] = useState(getName())
+  const [side, setSideState] = useState<LocationId | null>(getSide())
+  const [tab, setTab] = useState<Tab>('machines')
+  const [machines, setMachines] = useState<Machine[]>([])
+  const [allMachines, setAllMachines] = useState<Machine[]>([])
+  const [loads, setLoads] = useState<Load[]>([])
+  const [myLoads, setMyLoads] = useState<Load[]>([])
+  const [events, setEvents] = useState<CampEvent[]>([])
+  const [notifState, setNotifState] = useState<PushResult | 'unknown'>(
+    'Notification' in window && Notification.permission === 'granted' ? 'granted' : 'unknown',
+  )
+
+  const refresh = useCallback(async () => {
+    if (!side) return
+    try {
+      const [ms, pines, timbers, ls, mine, evs] = await Promise.all([
+        adapter.getMachines(side),
+        adapter.getMachines('pines'),
+        adapter.getMachines('timbers'),
+        adapter.getActiveLoads(side),
+        adapter.getMyLoads(deviceId),
+        adapter.getEvents(),
+      ])
+      setMachines(ms)
+      setAllMachines([...pines, ...timbers])
+      setLoads(ls)
+      setMyLoads(mine)
+      setEvents(evs)
+    } catch (e) {
+      console.warn('refresh failed', e)
+    }
+  }, [adapter, deviceId, side])
+
+  useEffect(() => {
+    void refresh()
+    const unsub = adapter.subscribe(() => void refresh())
+    const poll = setInterval(() => void refresh(), 30000)
+    return () => {
+      unsub()
+      clearInterval(poll)
+    }
+  }, [adapter, refresh])
+
+  // In-app alerts for MY loads finishing or being displaced (server push
+  // covers the closed-app case in live mode).
+  useEffect(() => {
+    const notified = getNotified()
+    for (const l of myLoads) {
+      const label = machineLabel(allMachines, l.machineId)
+      const status = derivedStatus(l, now)
+      if (status === 'done' && !notified.done.includes(l.id)) {
+        markNotified('done', l.id)
+        pushBanner(`${label} is done! 🧺`, 'Go grab your clothes before someone else does.', 'success')
+        notifyLocal(`${label} is done!`, 'Go grab your clothes before someone else does.')
+      }
+      if (status === 'displaced' && !notified.displaced.includes(l.id)) {
+        markNotified('displaced', l.id)
+        pushBanner(
+          `Your load was taken out of ${label}`,
+          `${l.displacedByName ?? 'Someone'} needed the machine — check the table or baskets.`,
+          'warning',
+        )
+        notifyLocal(
+          `Your load was taken out of ${label}`,
+          'Check the table or baskets in the Sho.',
+        )
+      }
+    }
+  }, [myLoads, now, allMachines])
+
+  const handleOnboard = (newName: string, newSide: LocationId) => {
+    setName(newName)
+    setSide(newSide)
+    setNameState(newName)
+    setSideState(newSide)
+  }
+
+  const switchSide = (s: LocationId) => {
+    setSide(s)
+    setSideState(s)
+  }
+
+  const handleEnableNotifications = async () => {
+    if (!side) return
+    const result = await enableNotifications(adapter, deviceId, side, name)
+    setNotifState(result)
+    if (result === 'granted') {
+      pushBanner('Notifications on 🔔', "We'll ping you when your laundry is done.", 'success')
+    } else if (result === 'local-only') {
+      pushBanner(
+        'Notifications on (while app is open)',
+        isDemo()
+          ? 'Demo mode has no server push — alerts show while the app is open.'
+          : 'Push setup incomplete — alerts show while the app is open.',
+        'info',
+      )
+    } else if (result === 'denied') {
+      pushBanner('Notifications blocked', 'Enable them in your phone settings for this app.', 'warning')
+    }
+  }
+
+  if (!name || !side) {
+    return <Onboarding onDone={handleOnboard} />
+  }
+
+  const sideName = LOCATIONS.find((l) => l.id === side)!.name
+
+  return (
+    <div className="mx-auto min-h-dvh max-w-md bg-pine-faint pb-24">
+      {/* Cho-Yeh watermark behind everything */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-1/2 z-0 flex -translate-y-1/2 justify-center"
+      >
+        <img src="brand/cho-yeh-emblem.svg" alt="" className="w-[88%] max-w-sm opacity-[0.06]" />
+      </div>
+      <Banners />
+      <header className="sticky top-0 z-40 bg-gradient-to-b from-[#0a5c22] to-pine px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white shadow-lux">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <img
+              src="brand/cho-yeh-logo-white.png"
+              alt="Camp Cho-Yeh"
+              className="h-9 w-auto object-contain drop-shadow"
+            />
+            <div>
+              <h1 className="font-display text-xl font-semibold leading-tight tracking-tight">
+                The Sho
+              </h1>
+              <div className="text-[9px] font-medium uppercase tracking-[0.25em] text-lime-200/80">
+                Nature That Nurtures
+              </div>
+            </div>
+          </div>
+          {isDemo() && (
+            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950">
+              DEMO
+            </span>
+          )}
+        </div>
+        <div className="relative mt-2.5 grid grid-cols-2 rounded-xl bg-pine-deep/70 p-1">
+          <div
+            className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-lg bg-white shadow transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              side === 'timbers' ? 'translate-x-[calc(100%+4px)]' : ''
+            }`}
+          />
+          {LOCATIONS.map((loc) => (
+            <button
+              key={loc.id}
+              onClick={() => switchSide(loc.id)}
+              className={`relative z-10 rounded-lg py-1.5 text-sm font-bold transition-colors duration-300 ${
+                side === loc.id ? 'text-pine' : 'text-lime-100/80'
+              }`}
+            >
+              {loc.id === 'pines' ? '🌲' : '🪵'} {loc.name}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <main key={`${tab}-${side}`} className="anim-rise relative z-10 pt-4">
+        {tab === 'machines' && (
+          <MachineBoard
+            machines={machines}
+            loads={loads}
+            now={now}
+            myDeviceId={deviceId}
+            onStart={async (machine, minutes) => {
+              try {
+                await adapter.startLoad({ machineId: machine.id, minutes, ownerName: name, deviceId })
+                pushBanner(
+                  `${machine.kind === 'washer' ? 'Washer' : 'Dryer'} ${machine.number} started`,
+                  `We'll ping you in ${minutes} min when it's done.`,
+                  'success',
+                )
+                await refresh()
+              } catch (e) {
+                pushBanner('Could not start the load', String(e), 'warning')
+              }
+            }}
+            onCollect={async (load) => {
+              await adapter.collectLoad(load.id, deviceId)
+              pushBanner('Thanks for clearing the machine! 🙌', '', 'success')
+              await refresh()
+            }}
+            onAdjust={async (load, minutes) => {
+              await adapter.adjustLoad(load.id, deviceId, minutes)
+              await refresh()
+            }}
+          />
+        )}
+        {tab === 'events' && (
+          <Events
+            events={events}
+            side={side}
+            now={now}
+            myDeviceId={deviceId}
+            onCreate={async (input) => {
+              try {
+                const event = await adapter.createEvent({
+                  ...input,
+                  creatorName: name,
+                  creatorDeviceId: deviceId,
+                })
+                await adapter.notifyEvent(event.id)
+                pushBanner('Event posted 🎉', 'Camp has been notified.', 'success')
+                await refresh()
+              } catch (e) {
+                pushBanner('Could not post the event', String(e), 'warning')
+              }
+            }}
+            onDelete={async (event) => {
+              await adapter.deleteEvent(event.id, deviceId)
+              await refresh()
+            }}
+            onReport={async (event) => {
+              await adapter.reportEvent(event.id)
+              pushBanner('Reported', 'Thanks — repeated reports hide an event.', 'info')
+              await refresh()
+            }}
+          />
+        )}
+        {tab === 'laundry' && (
+          <MyLaundry
+            myLoads={myLoads}
+            machines={allMachines}
+            now={now}
+            notifState={notifState}
+            onEnableNotifications={() => void handleEnableNotifications()}
+          />
+        )}
+      </main>
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-slate-200 bg-white pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="grid grid-cols-3">
+          {(
+            [
+              ['machines', '🫧', 'Machines'],
+              ['events', '📅', 'Events'],
+              ['laundry', '🧺', 'My Laundry'],
+            ] as [Tab, string, string][]
+          ).map(([t, icon, label]) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex flex-col items-center gap-0.5 py-2 text-xs font-semibold transition-all duration-200 ${
+                tab === t ? 'text-pine' : 'text-slate-400'
+              }`}
+            >
+              <span
+                className={`text-xl transition-transform duration-300 ${tab === t ? 'scale-110' : 'scale-100'}`}
+              >
+                {icon}
+              </span>
+              {label}
+            </button>
+          ))}
+        </div>
+      </nav>
+
+      <div className="px-4 pt-6 text-center text-[10px] leading-relaxed text-slate-400">
+        {sideName} · Camp Cho-Yeh — a place where Jesus Christ transforms lives through
+        meaningful relationships and outdoor adventures
+        <br />
+        Machine timers are camper-entered estimates
+      </div>
+    </div>
+  )
+}
+
+function machineLabel(machines: Machine[], machineId: string): string {
+  const m = machines.find((x) => x.id === machineId)
+  if (!m) return 'your machine'
+  const side = m.location === 'pines' ? 'Pines' : 'Timbers'
+  return `${side} ${m.kind === 'washer' ? 'Washer' : 'Dryer'} ${m.number}`
+}

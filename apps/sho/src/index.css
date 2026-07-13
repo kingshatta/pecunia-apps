@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/outfit';
+@import '@fontsource-variable/fraunces';
+
+/* Camp Cho-Yeh brand palette (from cho-yeh.org logo) */
+@theme {
+  --color-pine: #004712; /* deep pine — primary */
+  --color-pine-mid: #387c2b; /* medium green — secondary */
+  --color-pine-deep: #02300d; /* darker step for gradients */
+  --color-pine-soft: #e8f1e4; /* light surface tint */
+  --color-pine-faint: #f3f8f0; /* app background */
+  --font-display: 'Fraunces Variable', Georgia, serif; /* editorial display face */
+  --shadow-lux: 0 10px 32px -12px rgba(0, 71, 18, 0.28), 0 2px 8px -2px rgba(0, 71, 18, 0.08);
+  --shadow-card: 0 4px 20px -8px rgba(0, 71, 18, 0.14);
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Outfit Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background-color: #f3f8f0;
+}
+
+/* ---- motion system ---- */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.86); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes drop-in {
+  from { opacity: 0; transform: translateY(-16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0); }
+}
+
+.anim-rise { animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-scale { animation: scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-drop { animation: drop-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-sheet { animation: sheet-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-fade { animation: fade-in 0.25s ease-out both; }
+.anim-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
+
+/* stagger helpers for onboarding */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.15s; }
+.stagger-3 { animation-delay: 0.25s; }
+.stagger-4 { animation-delay: 0.35s; }
+.stagger-5 { animation-delay: 0.45s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-rise, .anim-scale, .anim-drop, .anim-sheet, .anim-fade, .anim-pulse-soft {
+    animation: none;
+  }
+  * { transition-duration: 0.01ms !important; }
+}
