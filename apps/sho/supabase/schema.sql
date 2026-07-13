@@ -3,7 +3,7 @@
 -- Supabase SQL Editor and click Run. Safe to run more than once.
 --
 -- >>> BEFORE RUNNING, EDIT ONE THING: <<<
--- YOUR-PROJECT-REF in the cron job at the very bottom
+-- Project ref jehsflkioicahjeigqst is baked into the cron job at the very bottom
 -- (find it in Project Settings → General → Reference ID).
 -- Machine seed below is 6 washers + 6 dryers per sho; adjust the
 -- generate_series(1, 6) only if the real counts ever change.
@@ -209,13 +209,13 @@ $$;
 -- ---------- notification tick ----------
 -- Every minute, ping the push edge function; it finds finished /
 -- overdue / displaced loads and notifies their owners.
--- >>> Replace YOUR-PROJECT-REF with your project's Reference ID. <<<
+-- Project ref: jehsflkioicahjeigqst (set 2026-07-13)
 select cron.schedule(
   'sho-push-tick',
   '* * * * *',
   $$
   select net.http_post(
-    url := 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/push',
+    url := 'https://jehsflkioicahjeigqst.supabase.co/functions/v1/push',
     headers := '{"Content-Type": "application/json"}'::jsonb,
     body := '{"type": "tick"}'::jsonb
   );
