@@ -350,7 +350,7 @@ export default function App() {
         {sideName} · Camp Cho-Yeh — a place where Jesus Christ transforms lives through
         meaningful relationships and outdoor adventures
         <br />
-        Sho hours: {OPEN_LABEL} – {LOCK_LABEL} · Machine timers are camper-entered estimates
+        Sho hours: {OPEN_LABEL} – {LOCK_LABEL} · Machine timers are user-entered estimates
       </div>
     </div>
   )

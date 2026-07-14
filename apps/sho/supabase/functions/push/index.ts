@@ -37,7 +37,7 @@ const REMINDERS: { after: number; title: (machine: string) => string; body: stri
   {
     after: 10,
     title: (m) => `${m} is still full ⏳`,
-    body: 'Please collect your laundry so the next camper can wash.',
+    body: 'Please collect your laundry so others can wash.',
   },
   {
     after: 30,
