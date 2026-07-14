@@ -11,6 +11,7 @@
 
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
+create extension if not exists pgcrypto; -- digest() for ownership secret hashes
 
 -- ---------- tables ----------
 
@@ -48,7 +49,10 @@ create table if not exists loads (
   notified_reminder_at timestamptz, -- legacy (single reminder); kept for compatibility
   notified_displaced_at timestamptz,
   -- how many "still sitting" reminders have been sent (milestones 5/10/30 min)
-  reminders_sent int not null default 0
+  reminders_sent int not null default 0,
+  -- sha256 of the owner's private device secret; proves ownership on
+  -- collect/adjust without exposing anything reversible on the public board.
+  owner_secret_hash text not null default ''
 );
 create index if not exists loads_machine_running on loads (machine_id) where status = 'running';
 create index if not exists loads_device on loads (device_id, started_at desc);
@@ -64,7 +68,9 @@ create table if not exists events (
   creator_device_id text not null,
   created_at timestamptz not null default now(),
   reports int not null default 0,
-  notified_at timestamptz
+  notified_at timestamptz,
+  creator_secret_hash text not null default '', -- proves ownership on delete
+  reporter_hashes text[] not null default '{}'  -- dedup: one report per device
 );
 
 create table if not exists push_subscriptions (
@@ -73,7 +79,8 @@ create table if not exists push_subscriptions (
   subscription jsonb not null,
   side text not null check (side in ('pines', 'timbers')),
   wants_events boolean not null default true,
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  owner_secret_hash text not null default '' -- guards against subscription hijack
 );
 
 -- ---------- row level security ----------
@@ -108,9 +115,24 @@ exception when duplicate_object then null;
 end $$;
 
 -- ---------- write functions (called by the app via RPC) ----------
+-- Every write goes through one of these SECURITY DEFINER functions; anon has
+-- no direct INSERT/UPDATE/DELETE on any table. Ownership of a load/event is
+-- proven with a private per-device secret whose SHA-256 is stored server-side
+-- (the raw secret is never stored or returned), so scraping a device_id off
+-- the public board is not enough to act on someone else's laundry or event.
+-- New secret args default to '' so a mid-deploy old client still works; rows
+-- created without a secret ('' hash) fall back to device_id-only ownership.
+
+-- search_path includes extensions because pgcrypto's digest() lives there on Supabase.
+create or replace function sho_hash(p text)
+returns text language sql immutable set search_path = public, extensions as $$
+  select case when coalesce(p, '') = '' then ''
+              else encode(digest(p, 'sha256'), 'hex') end;
+$$;
 
 create or replace function start_load(
-  p_machine_id text, p_minutes int, p_owner_name text, p_device_id text
+  p_machine_id text, p_minutes int, p_owner_name text, p_device_id text,
+  p_device_secret text default ''
 ) returns loads
 language plpgsql security definer set search_path = public as $$
 declare
@@ -123,6 +145,11 @@ begin
   if length(trim(p_owner_name)) < 1 or length(p_owner_name) > 40 then
     raise exception 'name required (max 40 chars)';
   end if;
+  -- rate limit: at most 6 starts per device in a 2-minute window
+  if (select count(*) from loads
+      where device_id = p_device_id and started_at > now() - interval '2 minutes') >= 6 then
+    raise exception 'Too many loads started just now — please wait a moment.';
+  end if;
   select * into v_machine from machines where id = p_machine_id;
   if not found then
     raise exception 'unknown machine %', p_machine_id;
@@ -133,23 +160,26 @@ begin
   set status = 'displaced', displaced_at = now(), displaced_by_name = trim(p_owner_name)
   where machine_id = p_machine_id and status = 'running';
 
-  insert into loads (machine_id, location, owner_name, device_id, ends_at)
+  insert into loads (machine_id, location, owner_name, device_id, ends_at, owner_secret_hash)
   values (p_machine_id, v_machine.location, trim(p_owner_name), p_device_id,
-          now() + make_interval(mins => p_minutes))
+          now() + make_interval(mins => p_minutes), sho_hash(p_device_secret))
   returning * into v_load;
   return v_load;
 end $$;
 
-create or replace function collect_load(p_load_id uuid, p_device_id text)
-returns void
+create or replace function collect_load(
+  p_load_id uuid, p_device_id text, p_device_secret text default ''
+) returns void
 language sql security definer set search_path = public as $$
   update loads
   set status = 'collected', collected_at = now()
-  where id = p_load_id and device_id = p_device_id and status = 'running';
+  where id = p_load_id and device_id = p_device_id and status = 'running'
+    and (owner_secret_hash = '' or owner_secret_hash = sho_hash(p_device_secret));
 $$;
 
-create or replace function adjust_load(p_load_id uuid, p_device_id text, p_minutes int)
-returns void
+create or replace function adjust_load(
+  p_load_id uuid, p_device_id text, p_minutes int, p_device_secret text default ''
+) returns void
 language plpgsql security definer set search_path = public as $$
 begin
   if p_minutes < 1 or p_minutes > 240 then
@@ -158,12 +188,14 @@ begin
   update loads
   set ends_at = now() + make_interval(mins => p_minutes),
       notified_done_at = null, notified_reminder_at = null, reminders_sent = 0
-  where id = p_load_id and device_id = p_device_id and status = 'running';
+  where id = p_load_id and device_id = p_device_id and status = 'running'
+    and (owner_secret_hash = '' or owner_secret_hash = sho_hash(p_device_secret));
 end $$;
 
 create or replace function create_event(
   p_title text, p_description text, p_place text, p_side text,
-  p_starts_at timestamptz, p_creator_name text, p_creator_device_id text
+  p_starts_at timestamptz, p_creator_name text, p_creator_device_id text,
+  p_creator_secret text default ''
 ) returns events
 language plpgsql security definer set search_path = public as $$
 declare v_event events;
@@ -177,36 +209,59 @@ begin
   if p_side not in ('pines', 'timbers', 'both') then
     raise exception 'bad side';
   end if;
-  insert into events (title, description, place, side, starts_at, creator_name, creator_device_id)
+  -- rate limit: at most 4 events per device in a 10-minute window (anti-spam,
+  -- since posting an event notifies the whole camp)
+  if (select count(*) from events
+      where creator_device_id = p_creator_device_id
+        and created_at > now() - interval '10 minutes') >= 4 then
+    raise exception 'Too many events posted — please wait a few minutes.';
+  end if;
+  insert into events (title, description, place, side, starts_at, creator_name,
+                      creator_device_id, creator_secret_hash)
   values (trim(p_title), trim(coalesce(p_description, '')), trim(p_place), p_side,
-          p_starts_at, trim(p_creator_name), p_creator_device_id)
+          p_starts_at, trim(p_creator_name), p_creator_device_id, sho_hash(p_creator_secret))
   returning * into v_event;
   return v_event;
 end $$;
 
-create or replace function delete_event(p_event_id uuid, p_device_id text)
-returns void
-language sql security definer set search_path = public as $$
-  delete from events where id = p_event_id and creator_device_id = p_device_id;
-$$;
-
-create or replace function report_event(p_event_id uuid)
-returns void
-language sql security definer set search_path = public as $$
-  update events set reports = reports + 1 where id = p_event_id;
-$$;
-
-create or replace function save_push_subscription(
-  p_device_id text, p_subscription jsonb, p_side text, p_owner_name text
+create or replace function delete_event(
+  p_event_id uuid, p_device_id text, p_device_secret text default ''
 ) returns void
 language sql security definer set search_path = public as $$
-  insert into push_subscriptions (device_id, subscription, side, owner_name, updated_at)
-  values (p_device_id, p_subscription, p_side, coalesce(p_owner_name, ''), now())
+  delete from events
+  where id = p_event_id and creator_device_id = p_device_id
+    and (creator_secret_hash = '' or creator_secret_hash = sho_hash(p_device_secret));
+$$;
+
+-- One report per device (dedup on a hash of the reporter's device id, so raw
+-- ids are never stored). Three DISTINCT reporters hide an event.
+create or replace function report_event(p_event_id uuid, p_device_id text default '')
+returns void
+language plpgsql security definer set search_path = public as $$
+declare v_h text := sho_hash(p_device_id);
+begin
+  if v_h = '' then
+    update events set reports = reports + 1 where id = p_event_id;
+  else
+    update events
+    set reports = reports + 1, reporter_hashes = array_append(reporter_hashes, v_h)
+    where id = p_event_id and not (v_h = any(reporter_hashes));
+  end if;
+end $$;
+
+create or replace function save_push_subscription(
+  p_device_id text, p_subscription jsonb, p_side text, p_owner_name text,
+  p_device_secret text default ''
+) returns void
+language sql security definer set search_path = public as $$
+  insert into push_subscriptions (device_id, subscription, side, owner_name, updated_at, owner_secret_hash)
+  values (p_device_id, p_subscription, p_side, coalesce(p_owner_name, ''), now(), sho_hash(p_device_secret))
   on conflict (device_id) do update
   set subscription = excluded.subscription,
       side = excluded.side,
       owner_name = excluded.owner_name,
-      updated_at = now();
+      updated_at = now()
+  where push_subscriptions.owner_secret_hash in ('', excluded.owner_secret_hash);
 $$;
 
 -- ---------- notification tick ----------

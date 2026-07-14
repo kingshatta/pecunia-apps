@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { DataAdapter, NewEventInput } from './DataAdapter'
 import type { CampEvent, EventSide, Load, LoadStatus, LocationId, Machine, MachineKind } from '../lib/types'
+import { getDeviceId, getDeviceSecret } from '../lib/device'
 
 // Name of the deployed Supabase Edge Function. Must match the function's name in
 // the dashboard AND the cron URL in supabase/schema.sql.
@@ -135,6 +136,7 @@ export class SupabaseAdapter implements DataAdapter {
       p_minutes: args.minutes,
       p_owner_name: args.ownerName,
       p_device_id: args.deviceId,
+      p_device_secret: getDeviceSecret(),
     })
     if (error) throw error
     return toLoad(data as LoadRow)
@@ -144,6 +146,7 @@ export class SupabaseAdapter implements DataAdapter {
     const { error } = await this.client.rpc('collect_load', {
       p_load_id: loadId,
       p_device_id: deviceId,
+      p_device_secret: getDeviceSecret(),
     })
     if (error) throw error
   }
@@ -153,6 +156,7 @@ export class SupabaseAdapter implements DataAdapter {
       p_load_id: loadId,
       p_device_id: deviceId,
       p_minutes: minutes,
+      p_device_secret: getDeviceSecret(),
     })
     if (error) throw error
   }
@@ -178,6 +182,7 @@ export class SupabaseAdapter implements DataAdapter {
       p_starts_at: input.startsAt,
       p_creator_name: input.creatorName,
       p_creator_device_id: input.creatorDeviceId,
+      p_creator_secret: getDeviceSecret(),
     })
     if (error) throw error
     return toEvent(data as EventRow)
@@ -187,12 +192,16 @@ export class SupabaseAdapter implements DataAdapter {
     const { error } = await this.client.rpc('delete_event', {
       p_event_id: eventId,
       p_device_id: deviceId,
+      p_device_secret: getDeviceSecret(),
     })
     if (error) throw error
   }
 
   async reportEvent(eventId: string): Promise<void> {
-    const { error } = await this.client.rpc('report_event', { p_event_id: eventId })
+    const { error } = await this.client.rpc('report_event', {
+      p_event_id: eventId,
+      p_device_id: getDeviceId(),
+    })
     if (error) throw error
   }
 
@@ -218,6 +227,7 @@ export class SupabaseAdapter implements DataAdapter {
       p_subscription: args.subscription,
       p_side: args.side,
       p_owner_name: args.ownerName,
+      p_device_secret: getDeviceSecret(),
     })
     if (error) throw error
   }
