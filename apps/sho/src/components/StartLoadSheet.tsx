@@ -88,7 +88,7 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
   if (!load || status === 'collected' || status === 'displaced' || takingOver) {
     if (locked) {
       return (
-        <Sheet title={title} onClose={onClose}>
+        <Sheet title={title} position="top" onClose={onClose}>
           <div className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
             🔒 The Sho is locked for the night ({LOCK_LABEL} – {OPEN_LABEL}). New loads can't be
             started until it opens.
@@ -97,7 +97,7 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
       )
     }
     return (
-      <Sheet title={takingOver ? `Take over ${title}` : `Start a load — ${title}`} onClose={onClose}>
+      <Sheet title={takingOver ? `Take over ${title}` : `Start a load — ${title}`} position="top" onClose={onClose}>
         {takingOver && load && (
           <div className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
             {load.ownerName}'s load will be marked as taken out, and they'll be told their
@@ -123,7 +123,7 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
   if (mine) {
     if (adjusting) {
       return (
-        <Sheet title={`Fix the timer — ${title}`} onClose={onClose}>
+        <Sheet title={`Fix the timer — ${title}`} position="top" onClose={onClose}>
           <MinutePicker
             machineKind={machine.kind}
             onPick={(m) => onAdjust(load, m)}
@@ -133,7 +133,7 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
       )
     }
     return (
-      <Sheet title={title} onClose={onClose}>
+      <Sheet title={title} position="top" onClose={onClose}>
         <div className="mb-4 text-sm text-slate-600">
           {status === 'running'
             ? `Your load has about ${formatMinutes(minutesLeft(load.endsAt, now))} left.`
@@ -160,7 +160,7 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
   // Someone else's load — keep it compact so "Take over" is visible without scrolling.
   const doneMins = status === 'done' ? minutesSince(load.endsAt, now) : 0
   return (
-    <Sheet title={title} onClose={onClose}>
+    <Sheet title={title} position="top" onClose={onClose}>
       <p className="mb-4 text-sm text-slate-600">
         {status === 'running' ? (
           <>

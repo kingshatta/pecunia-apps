@@ -184,7 +184,10 @@ export default function App() {
         <img src="brand/cho-yeh-emblem.svg" alt="" className="w-[88%] max-w-sm opacity-[0.06]" />
       </div>
       <Banners />
-      <header className="sticky top-0 z-40 bg-gradient-to-b from-[#0a5c22] to-pine px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white shadow-lux">
+      <header
+        id="sho-header"
+        className="sticky top-0 z-40 bg-gradient-to-b from-[#0a5c22] to-pine px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] text-white shadow-lux"
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img
@@ -228,6 +231,8 @@ export default function App() {
       </header>
 
       <HoursNotice now={now} />
+      {/* zero-height marker: top sheets open right below the notice/header */}
+      <div id="sho-top-anchor" aria-hidden />
 
       <main key={`${tab}-${side}`} className="anim-rise relative z-10 pt-4">
         {tab === 'machines' && (
