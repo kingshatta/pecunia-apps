@@ -42,6 +42,22 @@ tab visible, system notification when hidden, and the SW skips showNotification 
 any tab is visible; 10-min reminder reworded to a distinct "someone's waiting" nudge.
 All verified live (Playwright vs real site+DB: Timbers 2+2, 15-min preset, no DEMO).
 
+Update 2026-07-14c (SECURITY): full audit + hardening, LIVE & verified. Findings:
+(1) load/event ownership was authorized only by the publicly-readable device_id →
+anyone could scrape it and collect/adjust/delete others' items. FIX: per-device
+private secret (localStorage sho_device_secret), stored server-side only as sha256
+(sho_hash + owner_secret_hash/creator_secret_hash cols); collect/adjust/delete/
+save_push require it. (2) report_event had no dedup → one person hid any event. FIX:
+reporter_hashes[] dedup, 3 distinct devices. (3) unlimited event creation = camp push
+spam. FIX: rate limits (≤6 loads/2min, ≤4 events/10min per device). Migration applied
+via PAT (revoked); OLD function overloads DROPPED (create-or-replace with new arg count
+made overloads — the 2-arg insecure versions had to be dropped, also added to schema.sql).
+Verified with live attack-sim SQL (rollback DO-blocks): stolen device_id w/o secret
+blocked, owner w/ secret works; dedup=2; 5th event blocked. device_id still readable via
+REST (by design — harmless under hash-secret model). No XSS/injection/committed secrets;
+HTTPS throughout. PDF report generated (scratchpad/The-Sho-Security-Report.pdf) for camp
+leadership. Push fn UNCHANGED this round.
+
 Update 2026-07-14b: machine panels now open from the TOP (Sheet position='top',
 anchored to #sho-header/#sho-top-anchor so they start where the hours notice ends;
 slide-down anim + × close). All StartLoadSheet variants top-anchored; name/event

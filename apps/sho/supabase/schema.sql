@@ -123,6 +123,16 @@ end $$;
 -- New secret args default to '' so a mid-deploy old client still works; rows
 -- created without a secret ('' hash) fall back to device_id-only ownership.
 
+-- Drop the pre-hardening signatures so re-running this file on an older DB
+-- replaces them instead of leaving insecure overloads alongside the new ones.
+drop function if exists start_load(text, int, text, text);
+drop function if exists collect_load(uuid, text);
+drop function if exists adjust_load(uuid, text, int);
+drop function if exists create_event(text, text, text, text, timestamptz, text, text);
+drop function if exists delete_event(uuid, text);
+drop function if exists report_event(uuid);
+drop function if exists save_push_subscription(text, jsonb, text, text);
+
 -- search_path includes extensions because pgcrypto's digest() lives there on Supabase.
 create or replace function sho_hash(p text)
 returns text language sql immutable set search_path = public, extensions as $$
