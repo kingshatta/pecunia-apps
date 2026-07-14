@@ -45,8 +45,10 @@ create table if not exists loads (
   displaced_by_name text,
   -- set by the push edge function so nothing is ever double-sent
   notified_done_at timestamptz,
-  notified_reminder_at timestamptz,
-  notified_displaced_at timestamptz
+  notified_reminder_at timestamptz, -- legacy (single reminder); kept for compatibility
+  notified_displaced_at timestamptz,
+  -- how many "still sitting" reminders have been sent (milestones 5/10/30 min)
+  reminders_sent int not null default 0
 );
 create index if not exists loads_machine_running on loads (machine_id) where status = 'running';
 create index if not exists loads_device on loads (device_id, started_at desc);
@@ -155,7 +157,7 @@ begin
   end if;
   update loads
   set ends_at = now() + make_interval(mins => p_minutes),
-      notified_done_at = null, notified_reminder_at = null
+      notified_done_at = null, notified_reminder_at = null, reminders_sent = 0
   where id = p_load_id and device_id = p_device_id and status = 'running';
 end $$;
 

@@ -25,6 +25,27 @@ import { encodeBase64Url, decodeBase64Url } from 'jsr:@std/encoding@1/base64url'
 
 const GRACE_MINUTES = 10
 
+// After a load finishes and is still sitting in the machine, nudge the owner
+// at these minute marks. One reminder per mark; a missed mark (e.g. overnight
+// quiet hours) collapses into a single catch-up nudge.
+const REMINDERS: { after: number; title: (machine: string) => string; body: string }[] = [
+  {
+    after: 5,
+    title: (m) => `${m}: your laundry's ready ⏳`,
+    body: 'It finished a few minutes ago — grab it when you can.',
+  },
+  {
+    after: 10,
+    title: (m) => `${m} is still full ⏳`,
+    body: 'Please collect your laundry so the next camper can wash.',
+  },
+  {
+    after: 30,
+    title: (m) => `Please clear ${m} 🧺`,
+    body: "Your laundry's been done 30+ min — it may get set on the table so others can use the machine.",
+  },
+]
+
 // Camp quiet hours mirror the sho lock-up (11:30 PM – 7:00 AM camp time):
 // no pushes overnight. The tick's notified_*_at markers stay unset while
 // quiet, so the first tick after 7:00 AM delivers everything pending.
@@ -139,7 +160,6 @@ async function handleTick(): Promise<Response> {
   const admin = supabaseAdmin()
   const appServer = await getAppServer()
   const nowIso = new Date().toISOString()
-  const reminderCutoff = new Date(Date.now() - GRACE_MINUTES * 60000).toISOString()
   let sent = 0
 
   // 1. Loads that just finished
@@ -164,26 +184,32 @@ async function handleTick(): Promise<Response> {
     }
   }
 
-  // 2. Overdue reminders (done for GRACE_MINUTES, still not collected)
-  const { data: overdueLoads } = await admin
+  // 2. Reminders at 5 / 10 / 30 min after done, while still not collected.
+  const earliestReminderIso = new Date(Date.now() - REMINDERS[0].after * 60000).toISOString()
+  const { data: sittingLoads } = await admin
     .from('loads')
-    .select('id, machine_id, device_id')
+    .select('id, machine_id, device_id, ends_at, reminders_sent')
     .eq('status', 'running')
-    .lte('ends_at', reminderCutoff)
     .not('notified_done_at', 'is', null)
-    .is('notified_reminder_at', null)
-  if (overdueLoads && overdueLoads.length > 0) {
-    const subs = await subsForDevices(overdueLoads.map((l) => l.device_id))
-    for (const load of overdueLoads) {
+    .lt('reminders_sent', REMINDERS.length)
+    .lte('ends_at', earliestReminderIso)
+  if (sittingLoads && sittingLoads.length > 0) {
+    const subs = await subsForDevices(sittingLoads.map((l) => l.device_id))
+    for (const load of sittingLoads) {
+      const doneMin = (Date.now() - Date.parse(load.ends_at as string)) / 60000
+      const dueCount = REMINDERS.filter((r) => doneMin >= r.after).length
+      const already = (load.reminders_sent as number) ?? 0
+      if (dueCount <= already) continue
+      const r = REMINDERS[dueCount - 1] // send only the latest-due nudge
       const sub = subs.get(load.device_id)
       if (sub) {
-        const r = await sendTo(appServer, [sub], {
-          title: `Someone's waiting on ${machineLabel(load.machine_id)} ⏳`,
-          body: `Your laundry's been done ${GRACE_MINUTES}+ min — please come clear the machine.`,
+        const res = await sendTo(appServer, [sub], {
+          title: r.title(machineLabel(load.machine_id)),
+          body: r.body,
         })
-        sent += r.sent
+        sent += res.sent
       }
-      await admin.from('loads').update({ notified_reminder_at: nowIso }).eq('id', load.id)
+      await admin.from('loads').update({ reminders_sent: dueCount }).eq('id', load.id)
     }
   }
 
