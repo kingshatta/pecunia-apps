@@ -13,6 +13,7 @@ import { MachineBoard } from './screens/MachineBoard'
 import { Events } from './screens/Events'
 import { MyLaundry } from './screens/MyLaundry'
 import { Banners } from './components/Banners'
+import { NameSheet } from './components/NameSheet'
 import { HoursNotice } from './components/HoursNotice'
 import { LOCK_LABEL, OPEN_LABEL, isShoLocked, minutesUntilLock } from './lib/hours'
 
@@ -42,6 +43,7 @@ export default function App() {
 
   const [name, setNameState] = useState(getName())
   const [side, setSideState] = useState<LocationId | null>(getSide())
+  const [renaming, setRenaming] = useState(false)
   const [tab, setTab] = useState<Tab>('machines')
   const [machines, setMachines] = useState<Machine[]>([])
   const [allMachines, setAllMachines] = useState<Machine[]>([])
@@ -135,6 +137,18 @@ export default function App() {
     setSideState(s)
   }
 
+  const checkNameTaken = useCallback(
+    (candidate: string) => adapter.isNameTaken(candidate, deviceId),
+    [adapter, deviceId],
+  )
+
+  const handleChangeName = (newName: string) => {
+    setName(newName)
+    setNameState(newName)
+    setRenaming(false)
+    pushBanner('Name updated ✓', `You'll show as “${newName}” on machines you use.`, 'success')
+  }
+
   const handleEnableNotifications = async () => {
     if (!side) return
     const result = await enableNotifications(adapter, deviceId, side, name)
@@ -155,7 +169,7 @@ export default function App() {
   }
 
   if (!name || !side) {
-    return <Onboarding onDone={handleOnboard} />
+    return <Onboarding onDone={handleOnboard} checkNameTaken={checkNameTaken} />
   }
 
   const sideName = LOCATIONS.find((l) => l.id === side)!.name
@@ -288,11 +302,22 @@ export default function App() {
             myLoads={myLoads}
             machines={allMachines}
             now={now}
+            name={name}
             notifState={notifState}
             onEnableNotifications={() => void handleEnableNotifications()}
+            onChangeName={() => setRenaming(true)}
           />
         )}
       </main>
+
+      {renaming && (
+        <NameSheet
+          currentName={name}
+          checkNameTaken={checkNameTaken}
+          onSave={handleChangeName}
+          onClose={() => setRenaming(false)}
+        />
+      )}
 
       <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md border-t border-slate-200 bg-white pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         <div className="grid grid-cols-3">

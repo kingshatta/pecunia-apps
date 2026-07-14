@@ -157,11 +157,11 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
     )
   }
 
-  // Someone else's load
+  // Someone else's load — keep it compact so "Take over" is visible without scrolling.
   const doneMins = status === 'done' ? minutesSince(load.endsAt, now) : 0
   return (
     <Sheet title={title} onClose={onClose}>
-      <div className="mb-4 text-sm text-slate-600">
+      <p className="mb-4 text-sm text-slate-600">
         {status === 'running' ? (
           <>
             <span className="font-semibold">{load.ownerName}</span> has a load running — about{' '}
@@ -173,23 +173,18 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
             ago{doneMins >= GRACE_MINUTES ? " and hasn't been collected." : '.'}
           </>
         )}
-      </div>
-      {status === 'running' ? (
-        <div className="mb-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-          Machine busy — try another one, or take over only if this machine is actually empty.
-        </div>
-      ) : (
-        <div className="mb-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-          If you need this machine, you can take it over. Move their clothes somewhere kind
-          (the table, a basket — not the floor 🙂).
-        </div>
-      )}
+      </p>
       <button
         onClick={() => setTakingOver(true)}
         className="w-full rounded-xl border-2 border-amber-400 bg-amber-100 py-3.5 font-bold text-amber-900 active:bg-amber-200"
       >
         Take over this machine
       </button>
+      <p className="mt-2.5 text-xs leading-relaxed text-slate-500">
+        {status === 'running'
+          ? 'Machine busy — try another if you can. Only take over if it’s actually empty.'
+          : 'Moving someone’s laundry? Put it somewhere kind — the table or a basket, not the floor 🙂'}
+      </p>
     </Sheet>
   )
 }

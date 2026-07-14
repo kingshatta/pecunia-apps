@@ -113,6 +113,17 @@ export class LocalDemoAdapter implements DataAdapter {
     return machineList(location)
   }
 
+  async isNameTaken(name: string, exceptDeviceId: string): Promise<boolean> {
+    const norm = name.trim().toLowerCase()
+    if (!norm) return false
+    return this.load().loads.some(
+      (l) =>
+        l.status === 'running' &&
+        l.deviceId !== exceptDeviceId &&
+        l.ownerName.trim().toLowerCase() === norm,
+    )
+  }
+
   async getActiveLoads(location: LocationId): Promise<Load[]> {
     return this.load().loads.filter((l) => l.location === location && l.status === 'running')
   }

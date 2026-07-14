@@ -7,8 +7,10 @@ export interface MyLaundryProps {
   myLoads: Load[]
   machines: Machine[] // machines for BOTH sides so labels always resolve
   now: number
+  name: string
   notifState: PushResult | 'unknown'
   onEnableNotifications: () => void
+  onChangeName: () => void
 }
 
 function machineLabel(machines: Machine[], machineId: string): string {
@@ -19,7 +21,7 @@ function machineLabel(machines: Machine[], machineId: string): string {
 }
 
 export function MyLaundry(props: MyLaundryProps) {
-  const { myLoads, machines, now, notifState, onEnableNotifications } = props
+  const { myLoads, machines, now, name, notifState, onEnableNotifications, onChangeName } = props
 
   const statusLine = (l: Load): { text: string; cls: string } => {
     switch (derivedStatus(l, now)) {
@@ -42,6 +44,19 @@ export function MyLaundry(props: MyLaundryProps) {
 
   return (
     <div className="px-4 pb-6">
+      <div className="mb-3 flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
+        <div className="min-w-0">
+          <div className="text-xs text-slate-400">You're using the Sho as</div>
+          <div className="truncate font-bold text-slate-900">{name}</div>
+        </div>
+        <button
+          onClick={onChangeName}
+          className="shrink-0 rounded-xl border-2 border-slate-200 px-4 py-2 text-sm font-bold text-pine active:bg-slate-50"
+        >
+          Change
+        </button>
+      </div>
+
       {notifState !== 'granted' && notifState !== 'local-only' && (
         <div className="rounded-2xl bg-white p-4 shadow-sm">
           <div className="font-bold text-slate-900">🔔 Get pinged when your load is done</div>

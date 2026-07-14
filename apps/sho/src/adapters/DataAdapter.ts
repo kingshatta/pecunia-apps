@@ -19,6 +19,13 @@ export interface DataAdapter {
 
   getMachines(location: LocationId): Promise<Machine[]>
 
+  /**
+   * True if someone ELSE (any device but exceptDeviceId) currently has a
+   * running load under this name — so we can keep names unambiguous while
+   * machines are in use. Case-insensitive, whitespace-trimmed.
+   */
+  isNameTaken(name: string, exceptDeviceId: string): Promise<boolean>
+
   /** Uncollected loads (status "running", which includes derived "done"). */
   getActiveLoads(location: LocationId): Promise<Load[]>
 

@@ -88,6 +88,21 @@ export class SupabaseAdapter implements DataAdapter {
     }))
   }
 
+  async isNameTaken(name: string, exceptDeviceId: string): Promise<boolean> {
+    const norm = name.trim().toLowerCase()
+    if (!norm) return false
+    const { data, error } = await this.client
+      .from('loads')
+      .select('owner_name, device_id')
+      .eq('status', 'running')
+    if (error) return false
+    return (data ?? []).some(
+      (r) =>
+        (r.device_id as string) !== exceptDeviceId &&
+        String(r.owner_name).trim().toLowerCase() === norm,
+    )
+  }
+
   async getActiveLoads(location: LocationId): Promise<Load[]> {
     const { data, error } = await this.client
       .from('loads')
