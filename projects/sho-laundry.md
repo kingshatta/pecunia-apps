@@ -42,6 +42,13 @@ tab visible, system notification when hidden, and the SW skips showNotification 
 any tab is visible; 10-min reminder reworded to a distinct "someone's waiting" nudge.
 All verified live (Playwright vs real site+DB: Timbers 2+2, 15-min preset, no DEMO).
 
+Update 2026-07-14b: machine panels now open from the TOP (Sheet position='top',
+anchored to #sho-header/#sho-top-anchor so they start where the hours notice ends;
+slide-down anim + × close). All StartLoadSheet variants top-anchored; name/event
+sheets stay bottom. Copy: 'others' not 'camper' (push fn v6 deployed live).
+Verified: panel.top == notice bottom, start-load E2E from top panel, regressions
+green. LIVE.
+
 Update 2026-07-14: (a) Reminder cadence rewritten in code — nudges at 5/10/30 min
 after done (REMINDERS list in push fn; reminders_sent counter on loads, reset in
 adjust_load; latest-due-only so quiet-hours gaps collapse to one catch-up).
