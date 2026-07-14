@@ -41,3 +41,14 @@ src/lib/chime.ts) on load-done. Deduped to one alert per event: banner+chime whe
 tab visible, system notification when hidden, and the SW skips showNotification while
 any tab is visible; 10-min reminder reworded to a distinct "someone's waiting" nudge.
 All verified live (Playwright vs real site+DB: Timbers 2+2, 15-min preset, no DEMO).
+
+Update 2026-07-13 (UX round, frontend-only, no backend touch): take-over sheet
+compacted so "Take over this machine" is visible without scrolling (status line →
+button → short courtesy note). Added change-name: "You're using the Sho as …/Change"
+card in My Laundry opens NameSheet. Name-in-use guard (adapter.isNameTaken, read-only,
+case-insensitive) blocks a name already on a running load by another device — enforced
+at onboarding + change-name with live inline hint; no DB migration, applies to future
+loads (existing loads keep their name). New: src/hooks/useNameCheck.ts,
+components/NameSheet.tsx. Verified via Playwright demo (name block, change flow,
+take-over button fully in viewport). Note: verify tests that open a free-machine start
+sheet must run at a daytime clock — the 11:30 PM–7 AM lock replaces the picker.
