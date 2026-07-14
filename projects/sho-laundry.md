@@ -45,8 +45,10 @@ All verified live (Playwright vs real site+DB: Timbers 2+2, 15-min preset, no DE
 Update 2026-07-14: (a) Reminder cadence rewritten in code — nudges at 5/10/30 min
 after done (REMINDERS list in push fn; reminders_sent counter on loads, reset in
 adjust_load; latest-due-only so quiet-hours gaps collapse to one catch-up).
-⚠️ NOT YET DEPLOYED to live backend — needs a temp Supabase PAT from Sheen to run the
-column migration + redeploy the push fn (Sheen was asked, hasn't provided yet).
+DEPLOYED LIVE 2026-07-14 (push fn v5) via temp PAT (revoked): reminders_sent column
+migrated, adjust_load updated. Proven end-to-end on deploy: Sheen's real load
+(pines-washer-4, done 45 min) got exactly one catch-up nudge (the 30-min one),
+reminders_sent=3 — the latest-due-only collapse works in production.
 (b) Hour-aware times SHIPPED LIVE: formatMinutes ('1h 12m' past 59m) across cards/
 sheets/My Laundry; countdown flips mm:ss→'1h 12m' at the hour; 'left' label on card
 countdowns; 'Free' text bumped; demo seeds a >1h dryer cycle. Verified via Playwright
