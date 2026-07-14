@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Load, Machine } from '../lib/types'
 import { GRACE_MINUTES, MINUTE_PRESETS, derivedStatus } from '../lib/types'
-import { minutesLeft, minutesSince } from '../lib/time'
+import { formatMinutes, minutesLeft, minutesSince } from '../lib/time'
 import { LOCK_LABEL, OPEN_LABEL } from '../lib/hours'
 import { Sheet } from './Sheet'
 
@@ -106,8 +106,8 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
         )}
         {minutesToLock <= 90 && (
           <div className="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-            🌙 The Sho locks at {LOCK_LABEL} — {minutesToLock} min from now. Make sure your load
-            finishes (and is collected) before then.
+            🌙 The Sho locks at {LOCK_LABEL} — {formatMinutes(minutesToLock)} from now. Make sure
+            your load finishes (and is collected) before then.
           </div>
         )}
         <MinutePicker
@@ -136,8 +136,8 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
       <Sheet title={title} onClose={onClose}>
         <div className="mb-4 text-sm text-slate-600">
           {status === 'running'
-            ? `Your load has about ${minutesLeft(load.endsAt, now)} min left.`
-            : `Your load finished ${minutesSince(load.endsAt, now)} min ago.`}
+            ? `Your load has about ${formatMinutes(minutesLeft(load.endsAt, now))} left.`
+            : `Your load finished ${formatMinutes(minutesSince(load.endsAt, now))} ago.`}
         </div>
         <button
           onClick={() => onCollect(load)}
@@ -165,12 +165,12 @@ export function StartLoadSheet(props: StartLoadSheetProps) {
         {status === 'running' ? (
           <>
             <span className="font-semibold">{load.ownerName}</span> has a load running — about{' '}
-            {minutesLeft(load.endsAt, now)} min left.
+            {formatMinutes(minutesLeft(load.endsAt, now))} left.
           </>
         ) : (
           <>
-            <span className="font-semibold">{load.ownerName}</span>'s load finished {doneMins} min
-            ago{doneMins >= GRACE_MINUTES ? " and hasn't been collected." : '.'}
+            <span className="font-semibold">{load.ownerName}</span>'s load finished{' '}
+            {formatMinutes(doneMins)} ago{doneMins >= GRACE_MINUTES ? " and hasn't been collected." : '.'}
           </>
         )}
       </p>

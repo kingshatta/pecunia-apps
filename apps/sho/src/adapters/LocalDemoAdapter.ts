@@ -53,7 +53,7 @@ function seedState(): DemoState {
       demoLoad('pines-washer-2', 'pines', 'Maddie', -18, 14),
       demoLoad('pines-washer-3', 'pines', 'Jake', -55, -22),
       demoLoad('pines-washer-5', 'pines', 'Noah', -8, 24),
-      demoLoad('pines-dryer-1', 'pines', 'Carlos', -20, 35),
+      demoLoad('pines-dryer-1', 'pines', 'Carlos', -20, 95), // >1h left → shows "1h 35m"
       // Timbers (2 washers + 2 dryers): a washer about to finish, a dryer just done
       demoLoad('timbers-washer-1', 'timbers', 'Priya', -28, 3),
       demoLoad('timbers-dryer-2', 'timbers', 'Sam', -62, -4),

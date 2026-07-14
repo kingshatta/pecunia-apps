@@ -1,6 +1,6 @@
 import type { Load, Machine } from '../lib/types'
 import { derivedStatus } from '../lib/types'
-import { countdown, minutesSince } from '../lib/time'
+import { countdown, formatMinutes, minutesSince } from '../lib/time'
 import { isIosSafariNotInstalled, type PushResult } from '../lib/push'
 
 export interface MyLaundryProps {
@@ -29,7 +29,7 @@ export function MyLaundry(props: MyLaundryProps) {
         return { text: `Running — ${countdown(l.endsAt, now)} left`, cls: 'text-sky-700' }
       case 'done':
         return {
-          text: `Done ${minutesSince(l.endsAt, now)}m ago — go get it!`,
+          text: `Done ${formatMinutes(minutesSince(l.endsAt, now))} ago — go get it!`,
           cls: 'text-amber-700',
         }
       case 'collected':

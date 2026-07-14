@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Load, Machine } from '../lib/types'
 import { GRACE_MINUTES, derivedStatus } from '../lib/types'
-import { countdown, minutesSince } from '../lib/time'
+import { countdown, formatMinutes, minutesSince } from '../lib/time'
 
 export interface MachineCardProps {
   machine: Machine
@@ -24,7 +24,7 @@ export function MachineCard({ machine, load, now, myDeviceId, onTap }: MachineCa
     cardClass = 'border-pine-mid/40 bg-pine-soft/60'
     statusEl = (
       <>
-        <div className="text-base font-bold text-pine">Free</div>
+        <div className="text-lg font-bold text-pine">Free</div>
         <div className="text-xs text-pine/60">Tap to start a load</div>
       </>
     )
@@ -37,6 +37,7 @@ export function MachineCard({ machine, load, now, myDeviceId, onTap }: MachineCa
       <>
         <div className="font-mono text-xl font-bold tabular-nums text-sky-700">
           {countdown(load!.endsAt, now)}
+          <span className="ml-1 font-sans text-xs font-semibold text-sky-600/70">left</span>
         </div>
         <div className="truncate text-xs text-slate-500">{load!.ownerName}</div>
         <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-100">
@@ -58,7 +59,7 @@ export function MachineCard({ machine, load, now, myDeviceId, onTap }: MachineCa
         <div
           className={`text-base font-bold ${overdue ? 'text-rose-700' : 'text-amber-700'}`}
         >
-          Done · {mins}m ago
+          Done · {formatMinutes(mins)} ago
         </div>
         <div className="truncate text-xs text-slate-500">
           {load!.ownerName}

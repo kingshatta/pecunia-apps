@@ -1,7 +1,19 @@
-/** "12:34" style countdown for a future ISO timestamp; "0:00" once past. */
+/** "45m" under an hour; "1h 12m" (or "2h") from 60 minutes up. */
+export function formatMinutes(mins: number): string {
+  if (mins < 60) return `${mins}m`
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  return m === 0 ? `${h}h` : `${h}h ${m}m`
+}
+
+/**
+ * Countdown for a future ISO timestamp: "12:34" (mm:ss) under an hour so the
+ * final minutes feel live, "1h 12m" beyond that; "0:00" once past.
+ */
 export function countdown(endsAt: string, now: number): string {
   const ms = Math.max(0, Date.parse(endsAt) - now)
   const totalSec = Math.round(ms / 1000)
+  if (totalSec >= 3600) return formatMinutes(Math.ceil(totalSec / 60))
   const m = Math.floor(totalSec / 60)
   const s = totalSec % 60
   return `${m}:${String(s).padStart(2, '0')}`
