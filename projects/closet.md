@@ -70,9 +70,38 @@ into my closet and answer.** Build that loop excellently; build everything else 
   and cutting the feed from v1 keeps the door closed until it's made on purpose.
 
 ## Current State
-**Spec'd, not built. Awaiting Sheen's go.** No `apps/closet/` folder yet, no code, no
-Supabase project, no credentials. Recommendation on the table: build v1 as the
-two-person app scoped above, verified end-to-end in demo mode via Playwright before any
-account or key exists. Does not conflict with The Sho — that build's only remaining item
-is a physical on-phone closed-app push test plus poster print, both Sheen-side actions,
-not agent work.
+**BUILT and verified in demo mode. Not deployed — awaiting Sheen's go.** Full app at
+`apps/closet/`: Vite + React 18 + TS strict + Tailwind v4 + PWA, DataAdapter with
+LocalDemoAdapter (seeded 33-piece wardrobe + seeded friend "Aaliyah" with 17 pieces +
+one open fit check) and a complete SupabaseAdapter. `npm run build` clean under strict
+TS. Playwright drive-through **30/30 green** against the production bundle at 390px:
+onboarding, suggestions + their reasoning, weather/vibe filters, collab mode ("Uses 2 of
+Aaliyah's"), save, shuffle, add a real photo (background knocked out on-device, colour
+read as "navy"), wear tracking, answering a fit check from her closet, borrow request,
+building and sending an outfit mixing both closets, persistence across reload, zero
+console errors and zero failed requests. Harness committed at `apps/closet/verify/`,
+screenshots in `verify/shots/`.
+
+Engine is rules + colour maths (`lib/outfit.ts`, `lib/color.ts`) — no model, no API cost,
+explains every suggestion. Fashion neutrals (black/white/grey/cream/beige/tan/camel/navy/
+denim) pair with anything; that predicate is what makes results look wearable. Two real
+bugs found and fixed by unit-checking the palette: cream and light-wash denim weren't
+classed as neutrals, and beige read as "yellow".
+
+Backend is written but unapplied: `supabase/schema.sql` has every table, RLS policy,
+`request_friend`/`mark_worn` RPCs and private-bucket storage rules. Access boundary is
+one predicate, `are_friends()`. Profiles are not publicly readable — no user enumeration.
+No Supabase project exists yet, no keys, `public/config.js` empty (so it runs in demo).
+
+DEPLOY CONFLICT HANDLED: The Sho force-pushes the Pages root and would wipe `closet/`.
+`deploy-sho.yml` now copies `closet/` forward first; `deploy-closet.yml` publishes only
+that subfolder. **Both files must reach `main` in the same merge** — DEPLOY.md step 0.
+
+REMAINING (all Sheen-side): create Supabase project, run schema.sql, fill config.js,
+merge, then the two-phone two-account test in DEPLOY.md step 8 — especially 8.6, which
+checks a closet is NOT visible before the friendship is accepted.
+
+STILL UNANSWERED: closet size (cataloguing effort) and whether you and Aaliyah wear the
+same size. Built around it rather than blocking: every item carries a size, and each
+friendship has a `size_compatible` flag that gates borrowing and collab. If sizes don't
+match, turn it off and the app degrades to fit-check advice, which still works.

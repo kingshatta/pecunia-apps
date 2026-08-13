@@ -1,0 +1,69 @@
+# Builds Closet and publishes it to the `closet/` folder of the GitHub Pages
+# site on every push to main.
+#
+# The Sho owns the root of the `gh-pages` branch and publishes by force-pushing
+# it. This workflow does the opposite: it clones the existing branch and
+# replaces only `closet/`, so it never touches The Sho. deploy-sho.yml carries a
+# matching step that copies `closet/` forward before ITS force-push, so the two
+# apps coexist. See apps/closet/DEPLOY.md step 0.
+name: Deploy Closet to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/closet/**'
+      - '.github/workflows/deploy-closet.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Same group as the Sho workflow so the two never publish at once.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/closet/package-lock.json
+      - run: npm ci
+        working-directory: apps/closet
+      - run: npm run build
+        working-directory: apps/closet
+        env:
+          CLOSET_BASE: /pecunia-apps/closet/
+      - name: Publish dist to gh-pages/closet
+        run: |
+          set -e
+          REMOTE="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git clone --depth 1 --branch gh-pages "$REMOTE" pages 2>/dev/null; then
+            echo "Updating the existing gh-pages branch"
+          else
+            echo "No gh-pages branch yet — starting one"
+            mkdir pages
+            git -C pages init -q -b gh-pages
+          fi
+          rm -rf pages/closet
+          mkdir -p pages/closet
+          cp -r apps/closet/dist/. pages/closet/
+          touch pages/.nojekyll
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing changed"
+            exit 0
+          fi
+          git commit -q -m "Deploy Closet from ${GITHUB_SHA::7}"
+          git push "$REMOTE" gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -41,6 +41,19 @@ jobs:
         working-directory: apps/sho/dist
         run: |
           touch .nojekyll
+          # This step force-pushes the whole branch, which would delete sibling
+          # apps published into subfolders. Carry them forward first.
+          # See apps/closet/DEPLOY.md step 0.
+          if git clone --depth 1 --branch gh-pages \
+              "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+              /tmp/existing-pages 2>/dev/null; then
+            for app in closet; do
+              if [ -d "/tmp/existing-pages/$app" ]; then
+                echo "Preserving /$app"
+                cp -r "/tmp/existing-pages/$app" "./$app"
+              fi
+            done
+          fi
           git init -q -b gh-pages
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
