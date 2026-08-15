@@ -40,10 +40,24 @@ async function run() {
   check('onboarding renders', await page.getByText('Your closet,').isVisible())
   await page.screenshot({ path: `${SHOTS}/01-onboarding.png` })
 
+  check(
+    'demo can be entered without typing anything',
+    await page.getByRole('button', { name: 'Show me the demo' }).isEnabled(),
+  )
+
   await page.getByLabel('Your name').fill('Sheen')
   await page.getByRole('button', { name: "Let's go" }).click()
   await page.getByRole('heading', { name: 'What to wear' }).waitFor()
   check('signs in to the outfits screen', true)
+
+  // A first-time viewer is walked through the app before anything else.
+  check('guided tour opens for a first-time viewer', await page.getByText(/Tour . 1 of/).isVisible())
+  await page.getByRole('button', { name: 'Next' }).click()
+  await page.waitForTimeout(150)
+  check('tour advances', await page.getByText(/Tour . 2 of/).isVisible())
+  await page.getByRole('button', { name: 'Skip tour' }).click()
+  await page.waitForTimeout(200)
+  check('tour dismisses', (await page.getByText(/Tour . \d of/).count()) === 0)
 
   // 2 — Fit check inbox banner --------------------------------------------
   const banner = page.getByRole('button', { name: /Dolce Nicole needs a fit check/ })

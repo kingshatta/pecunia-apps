@@ -12,7 +12,9 @@ export function Onboarding({ onSignedIn }: { onSignedIn: () => Promise<void> }) 
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!value.trim() || busy) return
+    // Demo mode accepts an empty name (the adapter falls back to "You"); live
+    // mode needs a real email address.
+    if (busy || (!adapter.demo && !value.trim())) return
     setBusy(true)
     setError(null)
     try {
@@ -54,10 +56,10 @@ export function Onboarding({ onSignedIn }: { onSignedIn: () => Promise<void> }) 
       ) : (
         <form onSubmit={submit} className="space-y-4">
           <Field
-            label={adapter.demo ? 'What should we call you?' : 'Your email'}
+            label={adapter.demo ? 'What should we call you? (optional)' : 'Your email'}
             hint={
               adapter.demo
-                ? 'Demo mode — everything stays on this device, and a wardrobe is already loaded so you can try it properly.'
+                ? 'Demo mode — no sign-up, nothing leaves this device, and a full wardrobe is already loaded so you can try it properly.'
                 : "We'll email you a sign-in link. No password to remember."
             }
           >
@@ -75,8 +77,16 @@ export function Onboarding({ onSignedIn }: { onSignedIn: () => Promise<void> }) 
 
           {error ? <p className="text-sm font-medium text-claret">{error}</p> : null}
 
-          <Button type="submit" full disabled={!value.trim() || busy}>
-            {busy ? 'One moment…' : adapter.demo ? "Let's go" : 'Send me a link'}
+          {/* In demo mode a name is optional — someone being handed the phone
+              should not have to type anything to get in. */}
+          <Button type="submit" full disabled={busy || (!adapter.demo && !value.trim())}>
+            {busy
+              ? 'One moment…'
+              : adapter.demo
+                ? value.trim()
+                  ? "Let's go"
+                  : 'Show me the demo'
+                : 'Send me a link'}
           </Button>
         </form>
       )}

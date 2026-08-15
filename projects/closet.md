@@ -111,6 +111,16 @@ disproportionately above l>0.8), jewelry rendered as specks (scaled up), and the
 treatment had landed on content — a person's name and the fit-check headline — now
 sentence-case Bodoni.
 
+Round 3 (2026-08-15) — DEMO-ABLE: built so it can be handed to someone cold.
+Entry needs nothing typed ("Show me the demo"; name optional — found and fixed a
+real bug where the button was enabled but the submit handler still bailed on an
+empty name). A five-step guided tour auto-starts on a first visit, drives the tab
+as it advances, is skippable, and is replayable from the You tab; "Reset the demo"
+now also re-arms the tour so the next person gets a clean run. Verified 34/34.
+Shareable single-file build: CSS, JS and both woff2 fonts inlined as data URIs,
+service worker and manifest stripped, zero external requests — confirmed in a
+browser that both typefaces actually load rather than silently falling back.
+
 Backend is written but unapplied: `supabase/schema.sql` has every table, RLS policy,
 `request_friend`/`mark_worn` RPCs and private-bucket storage rules. Access boundary is
 one predicate, `are_friends()`. Profiles are not publicly readable — no user enumeration.

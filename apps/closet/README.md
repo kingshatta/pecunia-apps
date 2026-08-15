@@ -136,6 +136,24 @@ waiting for an answer. Every feature — including the two-person collab loop �
 works with no account and no network. Add `?demo=1` to force it even once a
 backend is configured.
 
+## Showing it to someone
+
+Demo mode is built to be handed to a stranger:
+
+- **No sign-up.** The entry button reads "Show me the demo" and needs nothing
+  typed. A name is optional.
+- **A guided tour** starts automatically on a first visit — five steps, ordered
+  so the differentiated part (a friend picking out of your closet) lands early.
+  Skippable at any point, replayable from the You tab.
+- **Reset the demo** on the You tab wipes the wardrobe back to its seeded state
+  *and* re-arms the tour, so the next person gets the same clean run.
+- Everything stays in that person's browser. No account, no network, nothing
+  uploaded.
+
+To show it without deploying, publish the built app as a single self-contained
+HTML file (CSS, JS and both fonts inlined; service worker and manifest stripped)
+and share that link.
+
 ## Verifying
 
 ```bash

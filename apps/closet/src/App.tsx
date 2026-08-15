@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { getAdapter } from './adapters'
+import { DemoTour, TOUR } from './components/DemoTour'
 import { EyeIcon, FriendsIcon, HangerIcon, PersonIcon, SparkIcon } from './components/Icons'
 import { useClosetData } from './hooks/useClosetData'
 import { readInviteCode } from './lib/invite'
+import { markTourSeen, tourSeen } from './lib/tour'
 import { AddItem } from './screens/AddItem'
 import { FitChecks } from './screens/FitChecks'
 import { FriendCloset } from './screens/FriendCloset'
@@ -30,6 +32,30 @@ export default function App() {
   const [tab, setTab] = useState<Tab>(inviteCode ? 'friends' : 'outfits')
   const [addOpen, setAddOpen] = useState(false)
   const [friendViewId, setFriendViewId] = useState<string | null>(null)
+  // Guided tour, demo only: the app gets handed to people who've never seen it.
+  const [tourStep, setTourStep] = useState<number | null>(() =>
+    adapter.demo && !tourSeen() && !readInviteCode() ? 0 : null,
+  )
+
+  const advanceTour = () => {
+    setTourStep((s) => {
+      if (s === null) return null
+      const next = s + 1
+      if (next >= TOUR.length) return s
+      setTab(TOUR[next].tab)
+      return next
+    })
+  }
+
+  const endTour = () => {
+    markTourSeen()
+    setTourStep(null)
+  }
+
+  const restartTour = () => {
+    setTab(TOUR[0].tab)
+    setTourStep(0)
+  }
 
   if (data.loading) {
     return (
@@ -94,7 +120,7 @@ export default function App() {
                 initialCode={inviteCode}
               />
             )}
-            {tab === 'me' && <Me data={data} />}
+            {tab === 'me' && <Me data={data} onRestartTour={restartTour} />}
           </>
         )}
       </main>
@@ -140,6 +166,10 @@ export default function App() {
           </ul>
         </nav>
       )}
+
+      {tourStep !== null && !friendInView && !addOpen ? (
+        <DemoTour step={tourStep} onNext={advanceTour} onSkip={endTour} />
+      ) : null}
 
       <AddItem
         open={addOpen}

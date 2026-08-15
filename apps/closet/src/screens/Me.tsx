@@ -5,8 +5,15 @@ import { ItemTile } from '../components/ItemTile'
 import { Avatar, Button, Field, inputClass } from '../components/ui'
 import type { ClosetData } from '../hooks/useClosetData'
 import { freshness } from '../lib/outfit'
+import { clearTourSeen } from '../lib/tour'
 
-export function Me({ data }: { data: ClosetData }) {
+export function Me({
+  data,
+  onRestartTour,
+}: {
+  data: ClosetData
+  onRestartTour?: () => void
+}) {
   const adapter = getAdapter()
   const profile = data.session?.profile
   const [name, setName] = useState(profile?.name ?? '')
@@ -116,16 +123,25 @@ export function Me({ data }: { data: ClosetData }) {
               You're in demo mode: everything lives on this device, and the closet you're looking
               at is seeded sample data.
             </p>
-            <Button
-              variant="secondary"
-              full
-              onClick={async () => {
-                if (adapter instanceof LocalDemoAdapter) adapter.reset()
-                await data.refresh()
-              }}
-            >
-              Reset the demo
-            </Button>
+            <div className="flex gap-2">
+              {onRestartTour ? (
+                <Button variant="secondary" className="flex-1" onClick={onRestartTour}>
+                  Replay tour
+                </Button>
+              ) : null}
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={async () => {
+                  if (adapter instanceof LocalDemoAdapter) adapter.reset()
+                  // Hand the phone to the next person and they get the tour too.
+                  clearTourSeen()
+                  await data.refresh()
+                }}
+              >
+                Reset the demo
+              </Button>
+            </div>
           </>
         ) : null}
         <Button
