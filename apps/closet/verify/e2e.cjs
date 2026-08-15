@@ -46,7 +46,7 @@ async function run() {
   check('signs in to the outfits screen', true)
 
   // 2 — Fit check inbox banner --------------------------------------------
-  const banner = page.getByRole('button', { name: /Aaliyah needs a fit check/ })
+  const banner = page.getByRole('button', { name: /Dolce Nicole needs a fit check/ })
   check('incoming fit check surfaces on home', await banner.isVisible())
 
   // 3 — Suggestions --------------------------------------------------------
@@ -63,25 +63,25 @@ async function run() {
   await page.screenshot({ path: `${SHOTS}/02-outfits.png`, fullPage: false })
 
   // 4 — Filters ------------------------------------------------------------
-  await page.getByRole('button', { name: 'Cold out', exact: true }).click()
+  await page.getByRole('button', { name: 'Cold', exact: true }).click()
   await page.waitForTimeout(150)
   const coldCount = await page.locator('article').count()
   check('warmth filter still returns outfits', coldCount > 0, `${coldCount} for cold`)
 
-  await page.getByRole('button', { name: 'Any weather' }).click()
+  await page.getByRole('button', { name: 'Any', exact: true }).click()
   await page.getByRole('button', { name: 'Going out', exact: true }).click()
   await page.waitForTimeout(150)
   check('vibe filter returns outfits', (await page.locator('article').count()) > 0)
   await page.getByRole('button', { name: 'Any vibe' }).click()
 
   // 5 — Collab mode --------------------------------------------------------
-  await page.getByRole('button', { name: "+ Aaliyah's" }).click()
+  await page.getByRole('button', { name: "+ Dolce Nicole's" }).click()
   await page.waitForTimeout(200)
   const collabText = await page.locator('main').innerText()
   check(
     'collab mode mixes in the friend closet',
-    /Uses \d+ of Aaliyah's/.test(collabText),
-    (collabText.match(/Uses \d+ of Aaliyah's/) || [''])[0],
+    /Uses \d+ of Dolce Nicole's/.test(collabText),
+    (collabText.match(/Uses \d+ of Dolce Nicole's/) || [''])[0],
   )
   await page.screenshot({ path: `${SHOTS}/03-collab.png` })
 
@@ -144,10 +144,10 @@ async function run() {
   check('wear tracking updates', /just now/.test(wornNow))
   await page.getByRole('dialog').getByLabel('Close').first().click()
 
-  // 11 — Answer a fit check from Aaliyah's closet --------------------------
+  // 11 — Answer a fit check from Dolce Nicole's closet --------------------------
   await tab('Fit check').click()
   await page.getByRole('heading', { name: 'Fit check' }).waitFor()
-  check('fit check request from Aaliyah listed', await page.getByText(/dinner thing at 7/).isVisible())
+  check('fit check request from Dolce Nicole listed', await page.getByText(/dinner thing at 7/).isVisible())
   await page.screenshot({ path: `${SHOTS}/06-fitchecks.png` })
 
   await page.getByRole('button', { name: 'Pick for them' }).click()
@@ -167,12 +167,12 @@ async function run() {
   // 12 — Friends: code, friend closet, build & send ------------------------
   await tab('Friends').click()
   await page.getByRole('heading', { name: 'Friends' }).waitFor()
-  check('invite code shown', await page.getByText('DEMO01').isVisible())
-  check('friend listed', await page.getByText('Aaliyah').first().isVisible())
+  check('invite code shown', await page.getByText('SHN482').isVisible())
+  check('friend listed', await page.getByText('Dolce Nicole').first().isVisible())
   await page.screenshot({ path: `${SHOTS}/08-friends.png` })
 
-  await page.getByRole('button', { name: /Aaliyah/ }).first().click()
-  await page.getByRole('heading', { name: "Aaliyah's closet" }).waitFor()
+  await page.getByRole('button', { name: /Dolce Nicole/ }).first().click()
+  await page.getByRole('heading', { name: "Dolce Nicole's closet" }).waitFor()
   check('friend closet opens', true)
 
   // Borrow request from browse mode. Scope to the grid: the mode chips are
@@ -183,10 +183,10 @@ async function run() {
   await page.getByLabel('Borrow note').fill('for Friday, back Sunday')
   await page.getByRole('button', { name: 'Ask to borrow' }).click()
   await page.waitForTimeout(600)
-  check('borrow request sent', await page.getByText(/Asked Aaliyah for it/).isVisible())
+  check('borrow request sent', await page.getByText(/Asked Dolce Nicole for it/).isVisible())
 
   // Build an outfit for her, mixing in one of mine
-  await page.getByRole('button', { name: 'Build for Aaliyah' }).click()
+  await page.getByRole('button', { name: 'Build for Dolce Nicole' }).click()
   await page.waitForTimeout(200)
   const herTiles = page.locator('main div.grid button[aria-pressed]')
   await herTiles.nth(1).click()
@@ -201,20 +201,20 @@ async function run() {
   await page.getByLabel('Note').fill('wear this Saturday, jacket is yours to borrow')
   await page.getByRole('button', { name: 'Send outfit' }).click()
   await page.waitForTimeout(600)
-  check('outfit sent to friend', await page.getByText(/Sent to Aaliyah/).isVisible())
+  check('outfit sent to friend', await page.getByText(/Sent to Dolce Nicole/).isVisible())
 
   // 13 — Borrow request appears on the Friends tab -------------------------
   await page.getByRole('button', { name: 'Back' }).click()
   await tab('Friends').click()
   await page.waitForTimeout(300)
   const friendsText = await page.locator('main').innerText()
-  check('borrow request tracked', /Things you asked for/.test(friendsText))
+  check('borrow request tracked', /things you asked for/i.test(friendsText))
 
   // 14 — Me ----------------------------------------------------------------
   await tab('You').click()
   await page.getByRole('heading', { name: 'Sheen' }).waitFor()
   const meText = await page.locator('main').innerText()
-  check('profile shows wardrobe stats', /Pieces/.test(meText) && /Gathering dust/.test(meText))
+  check('profile shows wardrobe stats', /pieces/i.test(meText) && /gathering dust/i.test(meText))
   await page.screenshot({ path: `${SHOTS}/10-me.png` })
 
   // 15 — Persistence across reload ----------------------------------------

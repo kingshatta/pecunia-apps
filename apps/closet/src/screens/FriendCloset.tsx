@@ -88,13 +88,13 @@ export function FriendCloset({
         <button
           type="button"
           onClick={onBack}
-          className="-ml-2 mb-2 flex min-h-[44px] items-center gap-1 pr-3 text-[14px] font-semibold text-muted"
+          className="-ml-2 mb-2 flex min-h-[44px] items-center gap-1 pr-3 text-[14px] font-semibold text-graphite"
         >
           <BackIcon className="h-5 w-5" />
           Back
         </button>
-        <h1 className="text-[28px] font-semibold tracking-tight">{friend.name}'s closet</h1>
-        <p className="text-sm text-muted">
+        <h1 className="display text-[34px] leading-[1.05]">{friend.name}'s closet</h1>
+        <p className="text-[13px] text-graphite">
           {items.length} pieces
           {friend.sizeCompatible ? '' : ' · different sizes, so borrowing is off'}
         </p>
@@ -116,7 +116,7 @@ export function FriendCloset({
       </div>
 
       {flash ? (
-        <p className="mb-4 rounded-card bg-sage-soft px-4 py-3 text-[14px] font-semibold text-sage">
+        <p className="mb-4 rounded-card bg-stone px-4 py-3 text-[14px] font-semibold text-bronze">
           {flash}
         </p>
       ) : null}
@@ -142,8 +142,8 @@ export function FriendCloset({
 
           {mode === 'build' && myItems.length > 0 ? (
             <section className="mt-7">
-              <h2 className="mb-3 text-[15px] font-semibold">Add something of yours</h2>
-              <p className="mb-3 text-[13.5px] leading-relaxed text-muted">
+              <h2 className="u-label mb-3 block">Add something of yours</h2>
+              <p className="mb-3 text-[13.5px] leading-relaxed text-graphite">
                 Mixing both closets is the point — lend them a piece as part of the outfit.
               </p>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -163,7 +163,7 @@ export function FriendCloset({
       )}
 
       {mode === 'build' && picked.length > 0 ? (
-        <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 px-4 pt-3 backdrop-blur">
+        <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-porcelain/95 px-4 pt-3 backdrop-blur">
           <div className="mx-auto flex w-full max-w-[560px] items-center gap-3">
             <p className="flex-1 text-[14px] font-semibold">
               {picked.length} {picked.length === 1 ? 'piece' : 'pieces'} picked
@@ -192,7 +192,7 @@ export function FriendCloset({
         {detail ? (
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="h-40 w-32 shrink-0 overflow-hidden rounded-card border border-line bg-paper">
+              <div className="h-40 w-32 shrink-0 overflow-hidden rounded-card border border-hairline bg-stone">
                 <img
                   src={detail.imageUrl}
                   alt={detail.name}
@@ -201,21 +201,21 @@ export function FriendCloset({
               </div>
               <dl className="min-w-0 flex-1 space-y-2 text-[14px]">
                 <div>
-                  <dt className="text-muted">Type</dt>
+                  <dt className="text-graphite">Type</dt>
                   <dd className="font-medium">{CATEGORY_LABEL[detail.category]}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Colour</dt>
+                  <dt className="text-graphite">Colour</dt>
                   <dd className="font-medium">{detail.colorName}</dd>
                 </div>
                 {detail.size ? (
                   <div>
-                    <dt className="text-muted">Size</dt>
+                    <dt className="text-graphite">Size</dt>
                     <dd className="font-medium">{detail.size}</dd>
                   </div>
                 ) : null}
                 <div>
-                  <dt className="text-muted">Last worn</dt>
+                  <dt className="text-graphite">Last worn</dt>
                   <dd className="font-medium">
                     {wornLabel(detail.lastWornAt, detail.wearCount)}
                   </dd>
@@ -233,7 +233,7 @@ export function FriendCloset({
                 />
               </Field>
             ) : (
-              <p className="rounded-xl bg-paper px-3 py-2.5 text-[13.5px] leading-relaxed text-muted">
+              <p className="bg-stone px-3 py-2.5 text-[13.5px] leading-relaxed text-graphite">
                 You've marked that you two wear different sizes, so borrowing is turned off. You
                 can change that on the Friends tab.
               </p>
@@ -254,7 +254,7 @@ export function FriendCloset({
         }
       >
         <div className="space-y-4">
-          <p className="text-[14px] leading-relaxed text-muted">
+          <p className="text-[14px] leading-relaxed text-graphite">
             {picked.length} pieces. It'll show up under “Saved &amp; sent to you” on their phone.
           </p>
           <Field label="Add a note">

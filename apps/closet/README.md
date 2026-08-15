@@ -4,14 +4,14 @@ A free PWA where you photograph what you own, get outfit suggestions that
 actually go together, and hand your closet to your best friend when you're
 standing in front of it with nothing to wear.
 
-Built for two people first (Sheen + Aaliyah). Everything here is scoped to make
+Built for two people first (Sheen + Dolce Nicole). Everything here is scoped to make
 that work properly before it tries to be a product.
 
 ## The idea in one line
 
 Every dead closet app died on the cataloguing chore, and the ones that survived
 are solo-user utilities. The catalogue is not the product here — it's the tax.
-The product is **"Aaliyah, pick my fit", and she can actually reach into your
+The product is **"Dolce Nicole, pick my fit", and she can actually reach into your
 closet and answer.**
 
 ## What's in v1
@@ -22,7 +22,7 @@ closet and answer.**
 | Outfits | Rule-based suggestions filtered by weather and vibe, each one explaining itself. |
 | Collab | Flip one chip and the engine builds outfits across both closets. |
 | Fit check | "I have nothing to wear" → your friend picks from *your* actual wardrobe and sends it back. |
-| Friends | Six-character invite codes. **No contacts import, ever.** |
+| Friends | Invite by text or a six-character code. **No contacts import, ever.** |
 | Borrowing | Ask for a specific piece; track requested → lent → returned. |
 | Wear tracking | Every suggestion favours what you haven't worn. "Gathering dust" shows what you never reach for. |
 
@@ -76,6 +76,40 @@ nothing harmful, which is why the Add screen previews the result and lets you
 switch it off. **Upgrade path:** drop a WASM segmentation model in behind
 `removeFlatBackground()`; the signature is the seam. Left out of v1 because it's
 a multi-megabyte download for a step you can eyeball.
+
+### Inviting by phone number
+
+The Friends screen takes a phone number and opens the phone's own Messages app
+with the invite already written, carrying a link like `?invite=DNC742`. Tapping
+that link opens Closet on Friends with the code filled in.
+
+The number never leaves the device. There is deliberately **no** number →
+account lookup: that would be an enumeration oracle, letting anyone probe
+numbers to discover who uses the app. Sign-in remains an emailed magic link,
+because SMS auth needs a paid provider and this app runs on free tiers.
+
+### Look and feel
+
+Editorial fashion rather than app-store default: a stone ground (`#EDEBE6`),
+warm near-black ink, hairline rules instead of shadows, and squared geometry —
+rounded pills read as software, sharp edges read as couture. Bodoni Moda carries
+the display voice and Jost handles anything functional; both are self-hosted via
+`@fontsource`, so there is no CDN and nothing to block. One accent, claret, is
+spent only where something genuinely wants attention.
+
+It commits to a single light theme on purpose — fashion retail is a paper-like
+world — so every colour is painted explicitly rather than inherited.
+
+### Garment renderings
+
+`src/lib/silhouette.ts` draws each piece as an SVG with gradient shading from a
+consistent top-left light source, seams and topstitching, ribbed cuffs and
+waistbands, hardware, and a contact shadow. The shape is chosen from the item's
+**name** first and its category second, so a denim mini skirt, cargo pants and
+tailored trousers don't all come out as the same rectangle.
+
+These are the demo wardrobe's artwork and the fallback when a real photo fails
+to load. Anything you photograph yourself uses your actual picture.
 
 ### Security
 

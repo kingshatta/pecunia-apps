@@ -29,7 +29,7 @@ export interface SuggestArgs {
   /** Pieces the outfit must be built around. */
   anchorIds?: string[]
   limit?: number
-  /** Used only for reason text ("Aaliyah's jacket does the work here"). */
+  /** Used only for reason text ("Dolce Nicole's jacket does the work here"). */
   friendName?: string | null
 }
 

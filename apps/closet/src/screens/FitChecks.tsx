@@ -80,8 +80,8 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
     <div className="safe-top px-4">
       <header className="mb-4 flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-[28px] font-semibold tracking-tight">Fit check</h1>
-          <p className="text-sm text-muted">A second pair of eyes on your closet</p>
+          <h1 className="display text-[34px] leading-[1.05]">Fit check</h1>
+          <p className="text-[13px] text-graphite">A second pair of eyes on your closet</p>
         </div>
         <Button onClick={() => setAsking(true)} disabled={friends.length === 0}>
           Ask
@@ -98,18 +98,18 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
 
       {incoming.length > 0 ? (
         <section className="mb-7">
-          <h2 className="mb-3 text-[15px] font-semibold">Asked of you</h2>
+          <h2 className="u-label mb-3 block">Asked of you</h2>
           <div className="space-y-3">
             {incoming.map((f) => (
-              <article key={f.id} className="rounded-card border border-line bg-surface p-4">
+              <article key={f.id} className="rounded-card border border-hairline bg-porcelain p-4">
                 <div className="flex items-start gap-3">
                   <Avatar name={f.fromName} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[15px] font-semibold">{f.fromName}</p>
-                    <p className="text-[13px] text-muted">{ago(f.createdAt)}</p>
+                    <p className="display text-[19px] leading-tight">{f.fromName}</p>
+                    <p className="text-[13px] text-graphite">{ago(f.createdAt)}</p>
                   </div>
                   {f.status === 'answered' ? (
-                    <span className="rounded-full bg-sage-soft px-2.5 py-1 text-[12px] font-semibold text-sage">
+                    <span className="rounded-full bg-stone px-2.5 py-1 text-[12px] font-semibold text-bronze">
                       Answered
                     </span>
                   ) : null}
@@ -118,7 +118,7 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
                 {f.replies.length > 0 ? (
                   <div className="mt-3 space-y-2">
                     {f.replies.map((r) => (
-                      <div key={r.id} className="rounded-xl bg-paper p-3">
+                      <div key={r.id} className="bg-stone p-3">
                         <OutfitStrip items={lookup(r.itemIds)} max={5} />
                         {r.note ? (
                           <p className="mt-2 text-[13.5px] leading-relaxed">{r.note}</p>
@@ -154,26 +154,26 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
 
       {outgoing.length > 0 ? (
         <section>
-          <h2 className="mb-3 text-[15px] font-semibold">You asked</h2>
+          <h2 className="u-label mb-3 block">You asked</h2>
           <div className="space-y-3">
             {outgoing.map((f) => (
-              <article key={f.id} className="rounded-card border border-line bg-surface p-4">
+              <article key={f.id} className="rounded-card border border-hairline bg-porcelain p-4">
                 <div className="flex items-center gap-3">
                   <Avatar name={f.toName} size={32} />
                   <p className="min-w-0 flex-1 truncate text-[14px]">
                     <span className="font-semibold">{f.toName}</span>
-                    <span className="text-muted"> · {ago(f.createdAt)}</span>
+                    <span className="text-graphite"> · {ago(f.createdAt)}</span>
                   </p>
                   {f.status === 'open' ? (
-                    <span className="rounded-full bg-paper px-2.5 py-1 text-[12px] font-semibold text-muted">
+                    <span className="rounded-full bg-stone px-2.5 py-1 text-[12px] font-semibold text-graphite">
                       Waiting
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-2 text-[14px] leading-relaxed text-muted">“{f.note}”</p>
+                <p className="mt-2 text-[14px] leading-relaxed text-graphite">“{f.note}”</p>
                 {f.replies.map((r) => (
-                  <div key={r.id} className="mt-3 rounded-xl bg-berry-soft/60 p-3">
-                    <p className="mb-2 text-[13px] font-semibold">{r.authorName} picked:</p>
+                  <div key={r.id} className="mt-3 bg-claret-wash/60 p-3">
+                    <p className="u-label mb-2 block">{r.authorName} picked:</p>
                     <OutfitStrip items={lookup(r.itemIds)} max={5} />
                     {r.note ? (
                       <p className="mt-2 text-[13.5px] leading-relaxed">{r.note}</p>
@@ -208,7 +208,7 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
       >
         <div className="space-y-5">
           <div>
-            <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+            <p className="u-label mb-2 block">
               Who
             </p>
             <div className="space-y-2">
@@ -217,10 +217,10 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
                   key={f.id}
                   type="button"
                   onClick={() => setAskFriend(f.userId)}
-                  className={`flex min-h-[56px] w-full items-center gap-3 rounded-2xl border px-4 text-left ${
+                  className={`flex min-h-[56px] w-full items-center gap-3 border px-4 text-left ${
                     askFriend === f.userId
-                      ? 'border-ink bg-berry-soft/50'
-                      : 'border-line bg-surface'
+                      ? 'border-ink bg-claret-wash/50'
+                      : 'border-hairline bg-porcelain'
                   }`}
                 >
                   <Avatar name={f.name} size={36} />
@@ -258,10 +258,10 @@ export function FitChecks({ data, onOpenFriend }: FitChecksProps) {
       >
         {answering ? (
           <div className="space-y-4">
-            <p className="rounded-xl bg-paper px-3 py-2.5 text-[14px] leading-relaxed">
+            <p className="bg-stone px-3 py-2.5 text-[14px] leading-relaxed">
               “{answering.note}”
             </p>
-            <p className="text-[13px] text-muted">
+            <p className="text-[13px] text-graphite">
               Everything below is from {answering.fromName}'s closet — tap what they should wear.
             </p>
             <div className="grid grid-cols-3 gap-2.5">

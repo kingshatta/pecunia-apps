@@ -44,10 +44,10 @@ export function Me({ data }: { data: ClosetData }) {
       <header className="mb-6 flex items-center gap-4">
         <Avatar name={profile?.name ?? 'You'} size={56} />
         <div className="min-w-0">
-          <h1 className="truncate text-[26px] font-semibold tracking-tight">
+          <h1 className="truncate display text-[32px] leading-[1.05]">
             {profile?.name ?? 'You'}
           </h1>
-          <p className="font-mono text-[14px] tracking-[0.14em] text-muted">{profile?.code}</p>
+          <p className="font-mono text-[14px] tracking-[0.14em] text-graphite">{profile?.code}</p>
         </div>
       </header>
 
@@ -57,17 +57,17 @@ export function Me({ data }: { data: ClosetData }) {
           { label: 'Worn this month', value: wornThisMonth },
           { label: 'Friends', value: data.friends.filter((f) => f.status === 'accepted').length },
         ].map((s) => (
-          <div key={s.label} className="rounded-card border border-line bg-surface p-3 text-center">
+          <div key={s.label} className="rounded-card border border-hairline bg-porcelain p-3 text-center">
             <p className="text-[24px] font-semibold leading-tight">{s.value}</p>
-            <p className="mt-0.5 text-[12px] leading-tight text-muted">{s.label}</p>
+            <p className="mt-0.5 text-[12px] leading-tight text-graphite">{s.label}</p>
           </div>
         ))}
       </section>
 
       {dusty.length > 0 ? (
         <section className="mb-7">
-          <h2 className="text-[15px] font-semibold">Gathering dust</h2>
-          <p className="mb-3 text-[13.5px] leading-relaxed text-muted">
+          <h2 className="u-label">Gathering dust</h2>
+          <p className="mb-3 text-[13.5px] leading-relaxed text-graphite">
             Yours, and hardly worn. The outfit engine pushes these up on purpose.
           </p>
           <div className="no-scrollbar -mx-4 overflow-x-auto px-4">
@@ -83,7 +83,7 @@ export function Me({ data }: { data: ClosetData }) {
       ) : null}
 
       <section className="mb-7 space-y-4">
-        <h2 className="text-[15px] font-semibold">Your details</h2>
+        <h2 className="u-label">Your details</h2>
         <Field label="Name">
           <input
             className={inputClass}
@@ -109,10 +109,10 @@ export function Me({ data }: { data: ClosetData }) {
         </Button>
       </section>
 
-      <section className="space-y-3 border-t border-line pt-6">
+      <section className="space-y-3 border-t border-hairline pt-6">
         {adapter.demo ? (
           <>
-            <p className="text-[13.5px] leading-relaxed text-muted">
+            <p className="text-[13.5px] leading-relaxed text-graphite">
               You're in demo mode: everything lives on this device, and the closet you're looking
               at is seeded sample data.
             </p>

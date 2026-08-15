@@ -14,11 +14,11 @@ has whose jacket.
 The closet catalog is not the product — it's the tax you pay to reach the product. Every
 dead competitor (Cladwell, Pureple, Smart Closet) died on the cataloging chore, and the
 survivors (Whering, Stylebook, Indyx) are solo-user utilities with no friend graph.
-The novel, defensible loop here is **"Aaliyah, pick my fit" — and she can actually reach
+The novel, defensible loop here is **"Dolce Nicole, pick my fit" — and she can actually reach
 into my closet and answer.** Build that loop excellently; build everything else minimally.
 
 ## Key decisions (proposed 2026-08-11, AWAITING SHEEN'S GO)
-- **v1 is a two-person app.** Sheen + Aaliyah. N=2 is the ideal seed, not a cold start.
+- **v1 is a two-person app.** Sheen + Dolce Nicole. N=2 is the ideal seed, not a cold start.
 - **CUT from v1:** BeReal-style feed (empty room at N=2, most expensive to build,
   drags in moderation), contacts import, chat, subscriptions, merch.
 - **KEEP for v1:** closet capture + tagging, outfit engine, friend-by-code, shared
@@ -51,7 +51,7 @@ into my closet and answer.** Build that loop excellently; build everything else 
 ## Open questions for Sheen (blocking scope, not blocking start)
 1. **How many items are in each closet?** Determines whether cataloging is a 20-minute
    job or a 6-hour one. This is the make-or-break number for the whole app.
-2. **Do you and Aaliyah wear the same size?** The largest unstated assumption in the
+2. **Do you and Dolce Nicole wear the same size?** The largest unstated assumption in the
    spec — collab outfits and borrowing are near-useless across incompatible sizes.
 3. Both on iPhone? (PWA push needs iOS 16.4+ Add-to-Home-Screen.)
 4. Is this "an app for me and my best friend" or a business? The build differs.
@@ -72,11 +72,11 @@ into my closet and answer.** Build that loop excellently; build everything else 
 ## Current State
 **BUILT and verified in demo mode. Not deployed — awaiting Sheen's go.** Full app at
 `apps/closet/`: Vite + React 18 + TS strict + Tailwind v4 + PWA, DataAdapter with
-LocalDemoAdapter (seeded 33-piece wardrobe + seeded friend "Aaliyah" with 17 pieces +
+LocalDemoAdapter (seeded 33-piece wardrobe + seeded friend "Dolce Nicole" with 17 pieces +
 one open fit check) and a complete SupabaseAdapter. `npm run build` clean under strict
 TS. Playwright drive-through **30/30 green** against the production bundle at 390px:
 onboarding, suggestions + their reasoning, weather/vibe filters, collab mode ("Uses 2 of
-Aaliyah's"), save, shuffle, add a real photo (background knocked out on-device, colour
+Dolce Nicole's"), save, shuffle, add a real photo (background knocked out on-device, colour
 read as "navy"), wear tracking, answering a fit check from her closet, borrow request,
 building and sending an outfit mixing both closets, persistence across reload, zero
 console errors and zero failed requests. Harness committed at `apps/closet/verify/`,
@@ -87,6 +87,29 @@ explains every suggestion. Fashion neutrals (black/white/grey/cream/beige/tan/ca
 denim) pair with anything; that predicate is what makes results look wearable. Two real
 bugs found and fixed by unit-checking the palette: cream and light-wash denim weren't
 classed as neutrals, and beige read as "yellow".
+
+Round 2 (2026-08-15), all four requests done and re-verified 30/30:
+(a) Friend renamed Aaliyah → **Dolce Nicole** throughout (code DNC742; mine SHN482).
+(b) **Invite by phone number**: Friends screen takes a number and opens the phone's own
+Messages app with the invite pre-written, carrying an `?invite=CODE` link that lands the
+recipient on Friends with the code filled in (`lib/invite.ts`, native share sheet + copy
+link as fallbacks). Deliberately NO number→account lookup — that's an enumeration oracle;
+the number never leaves the device. Sign-in stays an emailed magic link (SMS auth needs a
+paid provider).
+(c) **Luxury redesign**: stone #EDEBE6 ground, warm near-black ink, claret accent, hairline
+rules instead of shadows, squared geometry, Bodoni Moda display + Jost UI (self-hosted via
+@fontsource, no CDN, inlined as data URIs for the artifact preview). Single light theme on
+purpose. Shared component classes live in `index.css` so the language is defined once.
+(d) **Garments look real**: `lib/silhouette.ts` rewritten with gradient shading from a
+fixed light source, seams, ribbed cuffs/waistbands, collars, buttons, hardware, contact
+shadows — and shape variants picked from the item NAME (tee/tank/cami/button-down/
+sweatshirt/sweater/long-sleeve, pants/cargo/shorts/skirt/pleated, slip vs dress,
+jacket/coat/cardigan, sneaker/boot/heel/sandal, tote/crossbody, hoops/studs/necklace,
+cap/beanie/scarf) so a denim mini skirt and cargo pants no longer render identically.
+Caught in review: pale garments dissolved into the tile (seams now darkened
+disproportionately above l>0.8), jewelry rendered as specks (scaled up), and the caps-label
+treatment had landed on content — a person's name and the fit-check headline — now
+sentence-case Bodoni.
 
 Backend is written but unapplied: `supabase/schema.sql` has every table, RLS policy,
 `request_friend`/`mark_worn` RPCs and private-bucket storage rules. Access boundary is
@@ -101,7 +124,7 @@ REMAINING (all Sheen-side): create Supabase project, run schema.sql, fill config
 merge, then the two-phone two-account test in DEPLOY.md step 8 — especially 8.6, which
 checks a closet is NOT visible before the friendship is accepted.
 
-STILL UNANSWERED: closet size (cataloguing effort) and whether you and Aaliyah wear the
+STILL UNANSWERED: closet size (cataloguing effort) and whether you and Dolce Nicole wear the
 same size. Built around it rather than blocking: every item carries a size, and each
 friendship has a `size_compatible` flag that gates borrowing and collab. If sizes don't
 match, turn it off and the app degrades to fit-check advice, which still works.

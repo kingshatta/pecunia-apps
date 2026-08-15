@@ -29,24 +29,24 @@ export function Onboarding({ onSignedIn }: { onSignedIn: () => Promise<void> }) 
   return (
     <div className="safe-top mx-auto flex min-h-dvh w-full max-w-[560px] flex-col justify-center px-6 pb-10">
       <div className="mb-8">
-        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-paper">
+        <div className="mb-5 flex h-14 w-14 items-center justify-center bg-ink text-stone">
           <HangerIcon className="h-7 w-7" />
         </div>
-        <h1 className="text-[32px] font-semibold leading-tight tracking-tight">
+        <h1 className="display text-[40px] leading-[1.02]">
           Your closet,
           <br />
           with your people in it.
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-muted">
+        <p className="mt-3 text-[15px] leading-relaxed text-graphite">
           Photograph what you own, get outfits that actually go together, and let your best
           friend pick your fit when you're staring at a full closet with nothing to wear.
         </p>
       </div>
 
       {sent ? (
-        <div className="rounded-card border border-line bg-surface p-5">
+        <div className="rounded-card border border-hairline bg-porcelain p-5">
           <h2 className="text-base font-semibold">Check your email</h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted">
+          <p className="mt-1.5 text-sm leading-relaxed text-graphite">
             We sent a sign-in link to {value}. Open it on this phone and you'll land right back
             here.
           </p>
@@ -73,7 +73,7 @@ export function Onboarding({ onSignedIn }: { onSignedIn: () => Promise<void> }) 
             />
           </Field>
 
-          {error ? <p className="text-sm font-medium text-berry">{error}</p> : null}
+          {error ? <p className="text-sm font-medium text-claret">{error}</p> : null}
 
           <Button type="submit" full disabled={!value.trim() || busy}>
             {busy ? 'One moment…' : adapter.demo ? "Let's go" : 'Send me a link'}
@@ -81,9 +81,9 @@ export function Onboarding({ onSignedIn }: { onSignedIn: () => Promise<void> }) 
         </form>
       )}
 
-      <p className="mt-8 text-[13px] leading-relaxed text-muted">
-        Friends are added with a six-character code you share yourself. Closet never reads your
-        contacts.
+      <p className="mt-8 text-[13px] leading-relaxed text-graphite">
+        You invite a friend by texting them a link, or by sharing a six-character code. Closet
+        never reads your contacts.
       </p>
     </div>
   )

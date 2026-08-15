@@ -1,17 +1,34 @@
+@import '@fontsource-variable/bodoni-moda';
+@import '@fontsource-variable/jost';
 @import 'tailwindcss';
 
+/*
+ * Closet's visual language: editorial fashion, not app-store default.
+ *
+ * Stone ground, warm near-black ink, hairline rules instead of shadows, and
+ * squared geometry — rounded pills read as software, sharp edges read as
+ * couture. Bodoni Moda carries the display voice (it is the magazine serif);
+ * Jost handles anything functional. One accent, claret, spent only on things
+ * that genuinely want attention.
+ *
+ * Deliberately single-theme. Fashion retail is an overwhelmingly light,
+ * paper-like world, so every colour is painted explicitly rather than
+ * inherited from the host.
+ */
 @theme {
-  --color-paper: #faf7f5;
-  --color-surface: #ffffff;
-  --color-ink: #1b1420;
-  --color-muted: #7d7079;
-  --color-line: #ebe2de;
-  --color-berry: #b4485f;
-  --color-berry-soft: #f8ecef;
-  --color-sage: #5c7a63;
-  --color-sage-soft: #edf2ed;
+  --color-stone: #edebe6;
+  --color-porcelain: #fbfaf9;
+  --color-ink: #14110f;
+  --color-graphite: #6c6660;
+  --color-hairline: #d9d5cd;
+  --color-claret: #6e2639;
+  --color-claret-wash: #f4ebed;
+  --color-bronze: #96784e;
 
-  --radius-card: 18px;
+  --font-display: 'Bodoni Moda Variable', 'Bodoni 72', Didot, Georgia, serif;
+  --font-sans: 'Jost Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --radius-card: 2px;
 }
 
 @layer base {
@@ -21,25 +38,180 @@
 
   body {
     margin: 0;
-    background: var(--color-paper);
+    background: var(--color-stone);
     color: var(--color-ink);
-    font-family:
-      ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    font-family: var(--font-sans);
+    font-feature-settings: 'kern' 1;
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: none;
   }
 
-  /* Stops iOS zooming the page when a form field is focused. */
+  /* 16px minimum stops iOS zooming the page on focus. */
   input,
   textarea,
   select,
   button {
-    font: inherit;
+    font-family: inherit;
     font-size: 16px;
   }
 
   button {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Wide-tracked micro caps. The workhorse label of every fashion book. */
+  .u-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-graphite);
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .card {
+    background: var(--color-porcelain);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    padding: 0 1.4rem;
+    border-radius: var(--radius-card);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+  }
+
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-stone);
+  }
+
+  /* A dimmed black slab reads as a broken button. Fall back to an outline. */
+  .btn-ink:disabled {
+    background: transparent;
+    color: var(--color-graphite);
+    border: 1px solid var(--color-hairline);
+    opacity: 1;
+  }
+
+  .btn-ink:active:not(:disabled) {
+    background: #2b2521;
+  }
+
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink);
+  }
+
+  .btn-quiet:active:not(:disabled) {
+    background: rgb(20 17 15 / 0.05);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-graphite);
+  }
+
+  .btn-ghost:active:not(:disabled) {
+    color: var(--color-ink);
+  }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--color-claret);
+    border: 1px solid color-mix(in srgb, var(--color-claret) 35%, transparent);
+  }
+
+  .btn-danger:active:not(:disabled) {
+    background: var(--color-claret-wash);
+  }
+
+  /* Squared chips with hairline borders — a rack of tags, not a row of pills. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.95rem;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background: transparent;
+    color: var(--color-graphite);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .chip[aria-pressed='true'] {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-stone);
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.85rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--color-hairline);
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.18s ease;
+  }
+
+  .input::placeholder {
+    color: color-mix(in srgb, var(--color-graphite) 55%, transparent);
+  }
+
+  .input:focus {
+    border-bottom-color: var(--color-ink);
+    outline: none;
+  }
+
+  /* A hairline rule with a caps label sitting on it. */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--color-hairline);
   }
 }
 
@@ -49,7 +221,7 @@
   }
 
   .safe-top {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 1.25rem);
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -58,6 +230,10 @@
 
   .no-scrollbar {
     scrollbar-width: none;
+  }
+
+  .tnum {
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -80,11 +256,11 @@
 }
 
 .animate-sheet-up {
-  animation: sheet-up 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: sheet-up 0.3s cubic-bezier(0.22, 0.75, 0.2, 1);
 }
 
 .animate-fade-in {
-  animation: fade-in 0.18s ease-out;
+  animation: fade-in 0.22s ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -76,8 +76,8 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
   return (
     <div className="safe-top px-4">
       <header className="mb-4">
-        <h1 className="text-[28px] font-semibold tracking-tight">What to wear</h1>
-        <p className="text-sm text-muted">
+        <h1 className="display text-[34px] leading-[1.05]">What to wear</h1>
+        <p className="text-[13px] text-graphite">
           {data.myItems.length} pieces
           {activeFriend ? ` + ${activeFriend.name}'s closet` : ''}
         </p>
@@ -87,14 +87,14 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
         <button
           type="button"
           onClick={onOpenFitChecks}
-          className="mb-4 flex w-full items-center gap-3 rounded-card border border-berry/25 bg-berry-soft px-4 py-3.5 text-left active:bg-berry/15"
+          className="mb-4 flex w-full items-center gap-3 rounded-card border border-claret/25 bg-claret-wash px-4 py-3.5 text-left active:bg-claret/15"
         >
-          <EyeIcon className="h-6 w-6 shrink-0 text-berry" />
+          <EyeIcon className="h-6 w-6 shrink-0 text-claret" />
           <span className="min-w-0 flex-1">
-            <span className="block text-[15px] font-semibold">
+            <span className="display block text-[19px] leading-tight">
               {incoming[0].fromName} needs a fit check
             </span>
-            <span className="block truncate text-[13px] text-muted">{incoming[0].note}</span>
+            <span className="block truncate text-[13px] text-graphite">{incoming[0].note}</span>
           </span>
         </button>
       ) : null}
@@ -114,7 +114,7 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
                 <Chips
                   ariaLabel="Weather"
                   options={[
-                    { value: 'any' as const, label: 'Any weather' },
+                    { value: 'any' as const, label: 'Any' },
                     ...WARMTHS.map((w) => ({ value: w, label: WARMTH_LABEL[w] })),
                   ]}
                   selected={[warmth]}
@@ -165,14 +165,14 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
           </div>
 
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-[15px] font-semibold">
+            <h2 className="u-label">
               {suggestions.length > 0 ? 'Put together for you' : 'Nothing fits those filters'}
             </h2>
             {suggestions.length > PAGE ? (
               <button
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
-                className="flex min-h-[44px] items-center gap-1.5 text-[14px] font-semibold text-berry"
+                className="flex min-h-[44px] items-center gap-1.5 text-[14px] font-semibold text-claret"
               >
                 <ShuffleIcon className="h-4 w-4" />
                 Show me others
@@ -189,17 +189,17 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
           ) : (
             <div className="space-y-3">
               {visible.map((s) => (
-                <article key={s.key} className="rounded-card border border-line bg-surface p-4">
+                <article key={s.key} className="rounded-card border border-hairline bg-porcelain p-4">
                   <OutfitStrip items={s.items} />
                   <ul className="mt-3 space-y-1">
                     {s.reasons.map((r) => (
-                      <li key={r} className="text-[13.5px] leading-relaxed text-muted">
+                      <li key={r} className="text-[13.5px] leading-relaxed text-graphite">
                         {r}
                       </li>
                     ))}
                   </ul>
                   {s.borrowedIds.length > 0 && activeFriend ? (
-                    <p className="mt-2 inline-block rounded-full bg-sage-soft px-2.5 py-1 text-[12px] font-semibold text-sage">
+                    <p className="mt-2 inline-block rounded-full bg-stone px-2.5 py-1 text-[12px] font-semibold text-bronze">
                       Uses {s.borrowedIds.length} of {activeFriend.name}'s
                     </p>
                   ) : null}
@@ -240,9 +240,9 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
       )}
 
       <section className="mt-8">
-        <h2 className="mb-3 text-[15px] font-semibold">Saved &amp; sent to you</h2>
+        <h2 className="u-label mb-3 block">Saved &amp; sent to you</h2>
         {data.outfits.length === 0 ? (
-          <p className="rounded-card border border-dashed border-line bg-surface/60 px-4 py-6 text-center text-sm text-muted">
+          <p className="rounded-card border border-dashed border-hairline bg-porcelain/60 px-4 py-6 text-center text-[13px] text-graphite">
             Outfits you save — and ones your friends put together for you — land here.
           </p>
         ) : (
@@ -252,11 +252,11 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
                 .map((id) => itemsById.get(id))
                 .filter((i): i is Item => !!i)
               return (
-                <article key={o.id} className="rounded-card border border-line bg-surface p-4">
+                <article key={o.id} className="rounded-card border border-hairline bg-porcelain p-4">
                   <div className="mb-2.5 flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="truncate text-[15px] font-semibold">{o.title}</h3>
-                      <p className="text-[13px] text-muted">
+                      <h3 className="truncate text-[15px]">{o.title}</h3>
+                      <p className="text-[13px] text-graphite">
                         {o.source === 'from-friend' ? `from ${o.authorName} · ` : ''}
                         {ago(o.createdAt)}
                       </p>
@@ -265,7 +265,7 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
                       <button
                         type="button"
                         onClick={() => onOpenFriend(o.authorId)}
-                        className="shrink-0 text-[13px] font-semibold text-berry"
+                        className="shrink-0 text-[13px] font-semibold text-claret"
                       >
                         Their closet
                       </button>
@@ -273,7 +273,7 @@ export function Outfits({ data, onAdd, onOpenFriend, onOpenFitChecks }: OutfitsP
                   </div>
                   {items.length > 0 ? <OutfitStrip items={items} /> : null}
                   {o.note ? (
-                    <p className="mt-2.5 rounded-xl bg-paper px-3 py-2 text-[13.5px] leading-relaxed">
+                    <p className="mt-2.5 bg-stone px-3 py-2 text-[13.5px] leading-relaxed">
                       “{o.note}”
                     </p>
                   ) : null}

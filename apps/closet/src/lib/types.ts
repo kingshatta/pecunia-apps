@@ -40,9 +40,9 @@ export type Warmth = 'hot' | 'mild' | 'cold'
 export const WARMTHS: Warmth[] = ['hot', 'mild', 'cold']
 
 export const WARMTH_LABEL: Record<Warmth, string> = {
-  hot: 'Hot out',
+  hot: 'Hot',
   mild: 'Mild',
-  cold: 'Cold out',
+  cold: 'Cold',
 }
 
 export const WARMTH_SEASON: Record<Warmth, string> = {

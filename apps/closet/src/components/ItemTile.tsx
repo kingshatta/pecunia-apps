@@ -25,33 +25,33 @@ export function ItemTile({
       {...(onClick
         ? { type: 'button' as const, onClick: () => onClick(item), 'aria-pressed': selected }
         : {})}
-      className={`group relative flex w-full flex-col overflow-hidden rounded-card border text-left transition-colors ${
-        selected ? 'border-ink bg-berry-soft/50' : 'border-line bg-surface active:bg-paper'
+      className={`group relative flex w-full flex-col border text-left transition-colors ${
+        selected ? 'border-ink bg-porcelain' : 'border-hairline bg-porcelain'
       }`}
     >
-      <div className="relative aspect-[4/5] w-full bg-paper">
+      <div className="relative aspect-[4/5] w-full">
         <img
           src={item.imageUrl}
           alt={item.name}
           loading="lazy"
-          className="h-full w-full object-contain p-2"
+          className="h-full w-full object-contain p-3"
         />
         {badge ? (
-          <span className="absolute left-2 top-2 rounded-full bg-ink/80 px-2 py-0.5 text-[11px] font-semibold text-paper">
+          <span className="u-label absolute left-2 top-2 bg-ink px-1.5 py-1 text-stone">
             {badge}
           </span>
         ) : null}
         {selected ? (
-          <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-paper">
+          <span className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center bg-ink text-stone">
             <CheckIcon className="h-3.5 w-3.5" />
           </span>
         ) : null}
       </div>
-      <div className="px-3 pb-3 pt-2">
-        <p className="truncate text-[14px] font-semibold leading-tight">{item.name}</p>
-        <p className="mt-0.5 truncate text-[12px] text-muted">{itemSubtitle(item)}</p>
+      <div className="border-t border-hairline px-3 py-2.5">
+        <p className="truncate text-[13px] font-medium leading-tight">{item.name}</p>
+        <p className="mt-1 truncate text-[11.5px] text-graphite">{itemSubtitle(item)}</p>
         {showWorn ? (
-          <p className="mt-0.5 truncate text-[12px] text-muted/80">
+          <p className="mt-0.5 truncate text-[11.5px] text-graphite/75">
             {wornLabel(item.lastWornAt, item.wearCount)}
           </p>
         ) : null}
@@ -60,21 +60,20 @@ export function ItemTile({
   )
 }
 
-/** The little row of garment thumbnails that represents a whole outfit. */
+/** The row of garment thumbnails that stands in for a whole outfit. */
 export function OutfitStrip({ items, max = 6 }: { items: Item[]; max?: number }) {
   const shown = items.slice(0, max)
   const extra = items.length - shown.length
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       {shown.map((it) => (
-        <div
-          key={it.id}
-          className="h-16 w-14 shrink-0 overflow-hidden rounded-xl border border-line bg-paper"
-        >
+        <div key={it.id} className="h-20 w-16 shrink-0 border border-hairline bg-porcelain">
           <img src={it.imageUrl} alt={it.name} className="h-full w-full object-contain p-1" />
         </div>
       ))}
-      {extra > 0 ? <span className="text-[13px] font-medium text-muted">+{extra}</span> : null}
+      {extra > 0 ? (
+        <span className="text-[12px] text-graphite tnum">+{extra}</span>
+      ) : null}
     </div>
   )
 }

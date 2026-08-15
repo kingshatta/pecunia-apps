@@ -107,13 +107,16 @@ Needs iOS 16.4 or newer.
 Do this together, one phone each:
 
 1. Both sign in with your own email and open the link.
-2. **You** → Friends → read your six-character code out loud.
-3. Aaliyah types it into **Add someone by code** → you get a pending request.
+2. **You** → Friends → **Invite by text** → type their number → **Text it**. Your
+   Messages app should open with the invite written. Send it.
+3. They tap the link (it opens Closet with the code already filled) and tap
+   **Add** → you get a pending request. Reading the six-character code aloud
+   works too.
 4. You → Friends → **Accept**.
 5. Each add three or four pieces (a top, a bottom, shoes).
 6. Open her name → you should see her closet. **If you can see it before
    accepting, stop and tell me — that's a security bug, not a feature.**
-7. Outfits → tap **+ Aaliyah's** → suggestions should start mixing both closets.
+7. Outfits → tap **+ Dolce Nicole's** → suggestions should start mixing both closets.
 8. Fit check → **Ask** → she should get it, answer it out of your closet, and
    you should see her picks under "You asked".
 9. Her closet → tap a piece → **Ask to borrow** → she approves it on Friends.

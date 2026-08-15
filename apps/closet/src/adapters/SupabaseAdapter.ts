@@ -161,7 +161,8 @@ export class SupabaseAdapter implements DataAdapter {
         colorName: r.color_name,
         neutral: r.neutral,
         imageUrl:
-          (r.image_path ? signed.get(r.image_path) : undefined) ?? silhouette(r.category, color),
+          (r.image_path ? signed.get(r.image_path) : undefined) ??
+          silhouette(r.category, color, r.name),
         size: r.size,
         brand: r.brand,
         createdAt: r.created_at,

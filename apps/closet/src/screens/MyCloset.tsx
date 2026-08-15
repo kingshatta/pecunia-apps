@@ -53,15 +53,15 @@ export function MyCloset({ items, onAdd, onChanged }: MyClosetProps) {
     <div className="safe-top px-4">
       <header className="mb-4 flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-[28px] font-semibold tracking-tight">My closet</h1>
-          <p className="text-sm text-muted">
+          <h1 className="display text-[34px] leading-[1.05]">My closet</h1>
+          <p className="text-[13px] text-graphite">
             {items.length} {items.length === 1 ? 'piece' : 'pieces'}
           </p>
         </div>
         <button
           type="button"
           onClick={onAdd}
-          className="flex min-h-[48px] items-center gap-1.5 rounded-2xl bg-ink px-4 font-semibold text-paper active:bg-ink/85"
+          className="flex min-h-[48px] items-center gap-1.5 bg-ink px-4 font-semibold text-stone active:bg-ink/85"
         >
           <PlusIcon className="h-5 w-5" />
           Add
@@ -127,7 +127,7 @@ export function MyCloset({ items, onAdd, onChanged }: MyClosetProps) {
         {open ? (
           <div className="space-y-5">
             <div className="flex gap-4">
-              <div className="h-40 w-32 shrink-0 overflow-hidden rounded-card border border-line bg-paper">
+              <div className="h-40 w-32 shrink-0 overflow-hidden rounded-card border border-hairline bg-stone">
                 <img
                   src={open.imageUrl}
                   alt={open.name}
@@ -136,11 +136,11 @@ export function MyCloset({ items, onAdd, onChanged }: MyClosetProps) {
               </div>
               <dl className="min-w-0 flex-1 space-y-2 text-[14px]">
                 <div>
-                  <dt className="text-muted">Type</dt>
+                  <dt className="text-graphite">Type</dt>
                   <dd className="font-medium">{CATEGORY_LABEL[open.category]}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">Colour</dt>
+                  <dt className="text-graphite">Colour</dt>
                   <dd className="font-medium">
                     {open.colorName}
                     {open.neutral ? ' · goes with everything' : ''}
@@ -148,19 +148,19 @@ export function MyCloset({ items, onAdd, onChanged }: MyClosetProps) {
                 </div>
                 {open.size ? (
                   <div>
-                    <dt className="text-muted">Size</dt>
+                    <dt className="text-graphite">Size</dt>
                     <dd className="font-medium">{open.size}</dd>
                   </div>
                 ) : null}
                 <div>
-                  <dt className="text-muted">Last worn</dt>
+                  <dt className="text-graphite">Last worn</dt>
                   <dd className="font-medium">{wornLabel(open.lastWornAt, open.wearCount)}</dd>
                 </div>
               </dl>
             </div>
 
             <div>
-              <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+              <p className="u-label mb-2 block">
                 Warm enough for
               </p>
               <Chips
@@ -181,7 +181,7 @@ export function MyCloset({ items, onAdd, onChanged }: MyClosetProps) {
             </div>
 
             <div>
-              <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+              <p className="u-label mb-2 block">
                 Vibe
               </p>
               <Chips

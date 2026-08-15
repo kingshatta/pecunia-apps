@@ -138,22 +138,22 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center rounded-card border border-dashed border-line bg-surface px-6 py-14 text-center active:bg-paper"
+            className="flex w-full flex-col items-center rounded-card border border-dashed border-hairline bg-porcelain px-6 py-14 text-center active:bg-stone"
           >
-            <CameraIcon className="mb-3 h-9 w-9 text-muted" />
+            <CameraIcon className="mb-3 h-9 w-9 text-graphite" />
             <span className="text-base font-semibold">
               {working ? 'Reading photo…' : 'Take a photo'}
             </span>
-            <span className="mt-1 max-w-[30ch] text-sm leading-relaxed text-muted">
+            <span className="mt-1 max-w-[30ch] text-sm leading-relaxed text-graphite">
               Lay it flat on a plain surface. One garment per shot.
             </span>
           </button>
-          {error ? <p className="mt-4 text-sm font-medium text-berry">{error}</p> : null}
+          {error ? <p className="mt-4 text-sm font-medium text-claret">{error}</p> : null}
         </div>
       ) : (
         <div className="space-y-5 pb-2">
           <div className="flex gap-4">
-            <div className="h-40 w-32 shrink-0 overflow-hidden rounded-card border border-line bg-paper">
+            <div className="h-40 w-32 shrink-0 overflow-hidden rounded-card border border-hairline bg-stone">
               <img
                 src={photo.dataUrl}
                 alt="The item you're adding"
@@ -162,12 +162,12 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
             </div>
             <div className="min-w-0 flex-1 space-y-3">
               <div>
-                <p className="text-[13px] font-semibold uppercase tracking-wide text-muted">
+                <p className="u-label">
                   Colour picked up
                 </p>
                 <div className="mt-1.5 flex items-center gap-2">
                   <span
-                    className="h-6 w-6 shrink-0 rounded-full border border-line"
+                    className="h-6 w-6 shrink-0 rounded-full border border-hairline"
                     style={{ background: hslToCss(photo.color) }}
                     aria-hidden="true"
                   />
@@ -179,14 +179,14 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
                   type="checkbox"
                   checked={cutout}
                   onChange={() => void toggleCutout()}
-                  className="h-5 w-5 accent-[#1b1420]"
+                  className="h-5 w-5 accent-[#14110f]"
                 />
                 <span>Cut out the background</span>
               </label>
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="text-[14px] font-semibold text-berry underline underline-offset-2"
+                className="text-[14px] font-semibold text-claret underline underline-offset-2"
               >
                 Retake photo
               </button>
@@ -204,7 +204,7 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
           </Field>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+            <p className="u-label mb-2 block">
               Type
             </p>
             <Chips
@@ -216,7 +216,7 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
           </div>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+            <p className="u-label mb-2 block">
               Warm enough for
             </p>
             <Chips
@@ -230,7 +230,7 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
           </div>
 
           <div>
-            <p className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-muted">
+            <p className="u-label mb-2 block">
               Vibe
             </p>
             <Chips
@@ -264,7 +264,7 @@ export function AddItem({ open, onClose, onSaved }: AddItemProps) {
             </Field>
           </div>
 
-          {error ? <p className="text-sm font-medium text-berry">{error}</p> : null}
+          {error ? <p className="text-sm font-medium text-claret">{error}</p> : null}
         </div>
       )}
     </Sheet>

@@ -20,7 +20,7 @@ import type {
  */
 
 export const DEMO_ME = 'demo-me'
-export const DEMO_FRIEND = 'demo-aaliyah'
+export const DEMO_FRIEND = 'demo-nicole'
 
 const DAY = 86_400_000
 
@@ -51,7 +51,7 @@ function build(ownerId: string, prefix: string, specs: Spec[]): Item[] {
     color: s.color,
     colorName: colorName(s.color),
     neutral: isNeutral(s.color),
-    imageUrl: silhouette(s.category, s.color),
+    imageUrl: silhouette(s.category, s.color, s.name),
     size: s.size ?? null,
     brand: s.brand ?? null,
     createdAt: daysAgo(40 - i),
@@ -150,8 +150,8 @@ export function seedItems(): Item[] {
 
 export function seedProfiles(): Record<string, Profile> {
   return {
-    [DEMO_ME]: { id: DEMO_ME, name: 'You', code: 'DEMO01', sizes: 'S · 26 · 7' },
-    [DEMO_FRIEND]: { id: DEMO_FRIEND, name: 'Aaliyah', code: 'AALIYA', sizes: 'S · 26 · 7' },
+    [DEMO_ME]: { id: DEMO_ME, name: 'You', code: 'SHN482', sizes: 'S · 26 · 7' },
+    [DEMO_FRIEND]: { id: DEMO_FRIEND, name: 'Dolce Nicole', code: 'DNC742', sizes: 'S · 26 · 7' },
   }
 }
 
@@ -160,8 +160,8 @@ export function seedFriends(): Friend[] {
     {
       id: 'friendship-1',
       userId: DEMO_FRIEND,
-      name: 'Aaliyah',
-      code: 'AALIYA',
+      name: 'Dolce Nicole',
+      code: 'DNC742',
       status: 'accepted',
       sizeCompatible: true,
       createdAt: daysAgo(30),
@@ -175,7 +175,7 @@ export function seedOutfits(): Outfit[] {
       id: 'outfit-1',
       ownerId: DEMO_ME,
       authorId: DEMO_FRIEND,
-      authorName: 'Aaliyah',
+      authorName: 'Dolce Nicole',
       title: 'For Friday',
       // Navy silk cami + black jeans + black heels + my gold hoops + her gold chain.
       itemIds: ['mine-7', 'mine-10', 'mine-26', 'mine-27', 'hers-14'],
@@ -202,7 +202,7 @@ export function seedFitChecks(): FitCheck[] {
     {
       id: 'fitcheck-1',
       fromUserId: DEMO_FRIEND,
-      fromName: 'Aaliyah',
+      fromName: 'Dolce Nicole',
       toUserId: DEMO_ME,
       toName: 'You',
       note: "dinner thing at 7 and I've stared at this closet for 20 minutes. help",
