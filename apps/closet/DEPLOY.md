@@ -1,7 +1,24 @@
 # Deploying Closet
 
-Written for an iPad and a browser. No terminal needed. Nothing here goes live
-until you do it — the app is built and verified in demo mode already.
+Written for an iPad and a browser. No terminal needed.
+
+## Already live (demo mode)
+
+**https://kingshatta.github.io/pecunia-apps/closet/** — public, shareable, no
+account needed. Published 2026-08-15 by adding a `closet/` folder to the
+existing `gh-pages` branch; The Sho at the site root was not touched.
+
+That deploy was done by hand, so it is **not** yet wired to rebuild itself. Two
+consequences:
+
+- Pushing new code to the branch does not update the live site until the
+  workflows below reach `main`.
+- If The Sho deploys before then, its force-push deletes `closet/`. It only
+  deploys when something under `apps/sho/` changes, so this is unlikely — but
+  see step 0, and the fix is a re-run of the Closet workflow.
+
+The steps below are for going further: automatic deploys, and real accounts
+instead of the demo wardrobe.
 
 **Before you start, read step 0.** It's the one thing that can break The Sho.
 

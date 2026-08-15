@@ -70,7 +70,18 @@ into my closet and answer.** Build that loop excellently; build everything else 
   and cutting the feed from v1 keeps the door closed until it's made on purpose.
 
 ## Current State
-**BUILT and verified in demo mode. Not deployed — awaiting Sheen's go.** Full app at
+**LIVE (demo mode) at https://kingshatta.github.io/pecunia-apps/closet/** — published
+2026-08-15 on Sheen's go, by adding a `closet/` folder to the existing `gh-pages` branch.
+The Sho at the site root is untouched and still 200s (verified, title intact). Closet
+ships with an empty `config.js`, so the public link runs the seeded demo: no accounts, no
+backend, guided tour. Verified live via curl: index, JS, CSS, config, manifest, sw, icons
+and all seven woff2 font files all 200 at the new base path. A browser pass against the
+public HTTPS URL wasn't possible from this sandbox (Chromium can't be given the proxy CA
+without disabling TLS verification), but the identical bundle passed 34/34 in a real
+browser locally. NOTE: this deploy was manual, so it does NOT auto-update, and a Sho
+deploy would wipe `closet/` until the workflows land on `main`.
+
+Full app at
 `apps/closet/`: Vite + React 18 + TS strict + Tailwind v4 + PWA, DataAdapter with
 LocalDemoAdapter (seeded 33-piece wardrobe + seeded friend "Dolce Nicole" with 17 pieces +
 one open fit check) and a complete SupabaseAdapter. `npm run build` clean under strict
