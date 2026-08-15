@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/pecunia-apps/closet/sw.js', { scope: '/pecunia-apps/closet/' })})}
